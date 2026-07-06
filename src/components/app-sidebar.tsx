@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Megaphone, Search, Kanban, Send, MessagesSquare,
-  Calendar, Users2, BookOpen, Brain, BarChart3, Users, Settings, Sparkles,
+  LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
+  MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
+  BarChart3, Database, Plug, CreditCard, Bell,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -9,57 +10,63 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-const workspace = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Campaigns", url: "/campaigns", icon: Megaphone },
-  { title: "Lead Discovery", url: "/discovery", icon: Search },
-  { title: "Lead Queue", url: "/queue", icon: Kanban },
-  { title: "Outreach", url: "/outreach", icon: Send },
-  { title: "Conversations", url: "/conversations", icon: MessagesSquare },
-  { title: "Meetings", url: "/meetings", icon: Calendar },
-  { title: "CRM", url: "/crm", icon: Users2 },
-];
-
-const intelligence = [
-  { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
-  { title: "AI Sales Brain", url: "/brain", icon: Brain },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-];
-
-const admin = [
-  { title: "Team", url: "/team", icon: Users },
-  { title: "Settings", url: "/settings", icon: Settings },
+const groups = [
+  {
+    label: "Home",
+    items: [{ title: "Dashboard", url: "/", icon: LayoutDashboard }],
+  },
+  {
+    label: "Setup",
+    items: [
+      { title: "Profile", url: "/profile", icon: User },
+      { title: "AI Sales Brain", url: "/brain", icon: Brain },
+      { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
+    ],
+  },
+  {
+    label: "Discover",
+    items: [
+      { title: "Lead Discovery", url: "/discovery", icon: Search },
+      { title: "Manual Leads", url: "/manual-leads", icon: UserPlus },
+    ],
+  },
+  {
+    label: "Engage",
+    items: [
+      { title: "Outreach", url: "/outreach", icon: Send },
+      { title: "Conversations", url: "/conversations", icon: MessagesSquare },
+      { title: "Follow-ups", url: "/followups", icon: Repeat },
+    ],
+  },
+  {
+    label: "Close",
+    items: [
+      { title: "Interested", url: "/interested", icon: Sparkles },
+      { title: "Meetings", url: "/meetings", icon: Calendar },
+      { title: "Won Clients", url: "/won", icon: Trophy },
+      { title: "Not Interested", url: "/not-interested", icon: XCircle },
+    ],
+  },
+  {
+    label: "Optimize",
+    items: [
+      { title: "Analytics", url: "/analytics", icon: BarChart3 },
+      { title: "AI Memory", url: "/memory", icon: Database },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
+      { title: "Integrations", url: "/integrations", icon: Plug },
+      { title: "Billing", url: "/billing", icon: CreditCard },
+      { title: "Notifications", url: "/notifications", icon: Bell },
+    ],
+  },
 ];
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const isActive = (url: string) => (url === "/" ? pathname === "/" : pathname.startsWith(url));
-
-  const renderGroup = (label: string, items: typeof workspace) => (
-    <SidebarGroup>
-      <SidebarGroupLabel className="px-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
-        {label}
-      </SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.url)}
-                className="h-9 rounded-xl data-[active=true]:bg-white data-[active=true]:shadow-sm data-[active=true]:text-foreground"
-              >
-                <Link to={item.url} className="flex items-center gap-2.5">
-                  <item.icon className="h-[17px] w-[17px]" strokeWidth={1.75} />
-                  <span className="text-[13.5px] font-medium">{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  );
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border/60">
@@ -76,9 +83,31 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        {renderGroup("Workspace", workspace)}
-        {renderGroup("Intelligence", intelligence)}
-        {renderGroup("Admin", admin)}
+        {groups.map((g) => (
+          <SidebarGroup key={g.label}>
+            <SidebarGroupLabel className="px-3 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/60">
+              {g.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {g.items.map((item) => (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive(item.url)}
+                      className="h-8.5 rounded-xl data-[active=true]:bg-white data-[active=true]:shadow-sm data-[active=true]:text-foreground"
+                    >
+                      <Link to={item.url} className="flex items-center gap-2.5">
+                        <item.icon className="h-[16px] w-[16px]" strokeWidth={1.75} />
+                        <span className="text-[13px] font-medium">{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       <SidebarFooter className="p-3">

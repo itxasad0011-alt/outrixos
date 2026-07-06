@@ -4,15 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer,
-  Tooltip, XAxis, YAxis,
+  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
-  ArrowUpRight, TrendingUp, Users, Send, CheckCircle2, MessageSquare,
-  Sparkles, Calendar, Zap, Plus, Search, Play, Filter,
+  ArrowUpRight, Users, Send, MessageSquare, MessagesSquare, Sparkles,
+  Plus, Filter, Play, Zap, UserCheck, Reply, CalendarCheck, Search,
+  Repeat2, TrendingUp,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/")({
   component: Dashboard,
@@ -28,31 +28,32 @@ const activity = [
   { d: "Sun", sent: 25, replies: 7, meetings: 2 },
 ];
 
-const funnel = [
-  { stage: "Discovered", value: 1240 },
-  { stage: "Queued", value: 820 },
-  { stage: "Sent", value: 612 },
-  { stage: "Accepted", value: 289 },
-  { stage: "Replied", value: 142 },
-  { stage: "Interested", value: 48 },
-  { stage: "Booked", value: 21 },
+const kpis = [
+  { label: "Total Leads Found", value: "1,240", delta: "+18.4%", icon: Users, tint: "bg-blue-50 text-blue-600" },
+  { label: "Connections Sent", value: "612", delta: "+9.1%", icon: Send, tint: "bg-indigo-50 text-indigo-600" },
+  { label: "Reply Rate", value: "23.4%", delta: "+1.8%", icon: Reply, tint: "bg-amber-50 text-amber-600" },
+  { label: "Active Conversations", value: "84", delta: "+11", icon: MessagesSquare, tint: "bg-cyan-50 text-cyan-600" },
+  { label: "Interested Leads", value: "48", delta: "+12", icon: Sparkles, tint: "bg-fuchsia-50 text-fuchsia-600" },
+  { label: "Meetings Booked", value: "21", delta: "+6", icon: CalendarCheck, tint: "bg-emerald-50 text-emerald-600" },
+  { label: "Conversion Rate", value: "3.4%", delta: "+0.4%", icon: TrendingUp, tint: "bg-rose-50 text-rose-600" },
 ];
 
-const kpis = [
-  { label: "Leads Found", value: "1,240", delta: "+18.4%", icon: Users, tint: "bg-blue-50 text-blue-600" },
-  { label: "Connections Sent", value: "612", delta: "+9.1%", icon: Send, tint: "bg-indigo-50 text-indigo-600" },
-  { label: "Acceptance Rate", value: "47.2%", delta: "+3.2%", icon: CheckCircle2, tint: "bg-emerald-50 text-emerald-600" },
-  { label: "Reply Rate", value: "23.4%", delta: "+1.8%", icon: MessageSquare, tint: "bg-amber-50 text-amber-600" },
-  { label: "Interested", value: "48", delta: "+12", icon: Sparkles, tint: "bg-fuchsia-50 text-fuchsia-600" },
-  { label: "Meetings Booked", value: "21", delta: "+6", icon: Calendar, tint: "bg-cyan-50 text-cyan-600" },
-  { label: "Conversion", value: "3.4%", delta: "+0.4%", icon: TrendingUp, tint: "bg-rose-50 text-rose-600" },
+type FeedItem = { icon: LucideIcon; text: string; time: string; tint: string };
+const feed: FeedItem[] = [
+  { icon: CalendarCheck, text: "Meeting booked with Sarah Chen · Loom · Tue 10:00", time: "2m", tint: "text-emerald-600 bg-emerald-50" },
+  { icon: Reply, text: "Reply received from Marcus Reed · VP Sales @ Ramp", time: "8m", tint: "text-blue-600 bg-blue-50" },
+  { icon: Sparkles, text: "AI classified Priya Shah as Interested (94% confidence)", time: "14m", tint: "text-fuchsia-600 bg-fuchsia-50" },
+  { icon: Send, text: "Sent connection request to Julia Park · Blend", time: "22m", tint: "text-indigo-600 bg-indigo-50" },
+  { icon: Search, text: "AI found 12 new leads matching your ICP", time: "34m", tint: "text-slate-600 bg-slate-100" },
+  { icon: Repeat2, text: "Follow-up 2 sent to Ethan Wolfe · Cascade", time: "48m", tint: "text-amber-600 bg-amber-50" },
+  { icon: UserCheck, text: "Connection accepted by Nadia Ivanov · Sift", time: "1h", tint: "text-emerald-600 bg-emerald-50" },
+  { icon: MessageSquare, text: "AI drafted reply for review · David Ortiz", time: "1h", tint: "text-blue-600 bg-blue-50" },
 ];
 
 const conversations = [
-  { name: "Sarah Chen", role: "Head of Growth · Loom", msg: "Sounds great — Tuesday at 10 works.", intent: "Interested", tone: "emerald" },
-  { name: "Marcus Reed", role: "VP Sales · Ramp", msg: "Can you send over pricing details?", intent: "Warm", tone: "amber" },
-  { name: "Priya Shah", role: "Founder · Northwind", msg: "Following up on your last note…", intent: "Reply", tone: "blue" },
-  { name: "David Ortiz", role: "COO · Vantage", msg: "Not the right time — try Q1.", intent: "Cold", tone: "slate" },
+  { name: "Sarah Chen", role: "Head of Growth · Loom", msg: "Sounds great — Tuesday at 10 works.", intent: "Interested", tint: "bg-emerald-50 text-emerald-700" },
+  { name: "Marcus Reed", role: "VP Sales · Ramp", msg: "Can you send over pricing details?", intent: "Warm", tint: "bg-amber-50 text-amber-700" },
+  { name: "Priya Shah", role: "Founder · Northwind", msg: "Following up on your last note…", intent: "Reply", tint: "bg-blue-50 text-blue-700" },
 ];
 
 const meetings = [
@@ -66,14 +67,14 @@ function Dashboard() {
     <div>
       <PageHeader
         title="Good afternoon, Alex"
-        description="Your AI agent booked 3 meetings and started 12 new conversations today."
+        description="Your AI booked 3 meetings and started 12 new conversations today."
         actions={
           <>
             <Button variant="outline" className="h-9 rounded-xl border-border/70 bg-white text-[12.5px]">
               <Filter className="mr-1.5 h-3.5 w-3.5" /> Last 7 days
             </Button>
-            <Button className="h-9 rounded-xl bg-[#2563EB] text-[12.5px] hover:bg-[#1d4fd0]">
-              <Plus className="mr-1.5 h-3.5 w-3.5" /> New Campaign
+            <Button asChild className="h-9 rounded-xl bg-[#2563EB] text-[12.5px] hover:bg-[#1d4fd0]">
+              <Link to="/discovery"><Plus className="mr-1.5 h-3.5 w-3.5" /> Find leads</Link>
             </Button>
           </>
         }
@@ -103,8 +104,8 @@ function Dashboard() {
           <Card className="rounded-2xl border-border/60 bg-white shadow-none lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
-                <CardTitle className="text-[15px] font-semibold">Today's AI activity</CardTitle>
-                <p className="mt-1 text-[12px] text-muted-foreground">Outreach volume, replies, and meetings.</p>
+                <CardTitle className="text-[15px] font-semibold">Sales performance</CardTitle>
+                <p className="mt-1 text-[12px] text-muted-foreground">Outreach, replies, and meetings.</p>
               </div>
               <div className="flex gap-1 rounded-xl bg-secondary p-1 text-[11.5px]">
                 {["Daily", "Weekly", "Monthly"].map((t, i) => (
@@ -136,69 +137,67 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Lead Funnel */}
+          {/* AI Activity Feed */}
           <Card className="rounded-2xl border-border/60 bg-white shadow-none">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-[15px] font-semibold">Lead funnel</CardTitle>
-              <p className="text-[12px] text-muted-foreground">This month</p>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                <CardTitle className="text-[15px] font-semibold">AI activity · Live</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3 pt-2">
-              {funnel.map((s, i) => {
-                const pct = (s.value / funnel[0].value) * 100;
-                return (
-                  <div key={s.stage}>
-                    <div className="mb-1 flex justify-between text-[12px]">
-                      <span className="font-medium text-foreground">{s.stage}</span>
-                      <span className="text-muted-foreground">{s.value.toLocaleString()}</span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-indigo-500" style={{ width: `${pct}%`, opacity: 1 - i * 0.08 }} />
-                    </div>
-                  </div>
-                );
-              })}
+            <CardContent className="pt-0">
+              <div className="relative">
+                <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border/70" />
+                <ul className="space-y-3">
+                  {feed.map((f, i) => (
+                    <li key={i} className="relative flex items-start gap-3">
+                      <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${f.tint} ring-4 ring-white`}>
+                        <f.icon className="h-3.5 w-3.5" strokeWidth={2} />
+                      </div>
+                      <div className="min-w-0 flex-1 pt-1">
+                        <div className="text-[12.5px] leading-snug text-foreground">{f.text}</div>
+                        <div className="mt-0.5 text-[10.5px] text-muted-foreground">{f.time} ago</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          {/* Campaign overview */}
+          {/* Recent conversations */}
           <Card className="rounded-2xl border-border/60 bg-white shadow-none lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-[15px] font-semibold">Campaign overview</CardTitle>
+              <CardTitle className="text-[15px] font-semibold">Recent conversations</CardTitle>
               <Button asChild variant="ghost" size="sm" className="h-7 rounded-lg text-[12px] text-muted-foreground">
-                <Link to="/campaigns">View all <ArrowUpRight className="ml-1 h-3 w-3" /></Link>
+                <Link to="/conversations">Open inbox <ArrowUpRight className="ml-1 h-3 w-3" /></Link>
               </Button>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              {[
-                { name: "Q4 SaaS Founders — US", status: "Active", pct: 72, sent: 148, meetings: 9 },
-                { name: "Series A Growth Leaders", status: "Active", pct: 46, sent: 92, meetings: 4 },
-                { name: "Fintech Ops — EU", status: "Paused", pct: 88, sent: 210, meetings: 12 },
-              ].map((c) => (
-                <div key={c.name} className="flex items-center gap-4 rounded-xl border border-border/60 p-3.5 transition hover:bg-secondary/40">
-                  <div className={`grid h-9 w-9 place-items-center rounded-xl ${c.status === "Active" ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-500"}`}>
-                    <Zap className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate text-[13.5px] font-medium">{c.name}</span>
-                      <Badge variant="secondary" className={`h-5 rounded-full text-[10px] ${c.status === "Active" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
-                        {c.status}
-                      </Badge>
+            <CardContent className="pt-0">
+              <div className="divide-y divide-border/60">
+                {conversations.map((c) => (
+                  <div key={c.name} className="flex items-center gap-3 py-3">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-secondary text-[11px] font-medium">{c.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-[13px] font-medium">{c.name}</span>
+                        <span className="hidden truncate text-[11.5px] text-muted-foreground md:inline">· {c.role}</span>
+                      </div>
+                      <div className="truncate text-[12px] text-muted-foreground">{c.msg}</div>
                     </div>
-                    <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-muted-foreground">
-                      <span>{c.sent} sent</span>
-                      <span>·</span>
-                      <span>{c.meetings} meetings</span>
-                    </div>
+                    <Badge variant="secondary" className={`h-5 rounded-full text-[10.5px] ${c.tint}`}>
+                      {c.intent}
+                    </Badge>
                   </div>
-                  <div className="hidden w-40 md:block">
-                    <Progress value={c.pct} className="h-1.5" />
-                    <div className="mt-1 text-right text-[10.5px] text-muted-foreground">{c.pct}% of daily limit</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -222,64 +221,25 @@ function Dashboard() {
           </Card>
         </div>
 
-        {/* Recent conversations + Quick actions */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="rounded-2xl border-border/60 bg-white shadow-none lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-[15px] font-semibold">Recent conversations</CardTitle>
-              <Button asChild variant="ghost" size="sm" className="h-7 rounded-lg text-[12px] text-muted-foreground">
-                <Link to="/conversations">Open inbox</Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="divide-y divide-border/60">
-                {conversations.map((c) => (
-                  <div key={c.name} className="flex items-center gap-3 py-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-secondary text-[11px] font-medium">{c.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate text-[13px] font-medium">{c.name}</span>
-                        <span className="hidden truncate text-[11.5px] text-muted-foreground md:inline">· {c.role}</span>
-                      </div>
-                      <div className="truncate text-[12px] text-muted-foreground">{c.msg}</div>
-                    </div>
-                    <Badge variant="secondary" className={`h-5 rounded-full text-[10.5px] bg-${c.tone}-50 text-${c.tone}-700`}>
-                      {c.intent}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border-border/60 bg-gradient-to-br from-neutral-950 to-neutral-800 text-white shadow-none">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <div className="grid h-7 w-7 place-items-center rounded-lg bg-white/10">
-                  <Sparkles className="h-3.5 w-3.5" />
-                </div>
-                <CardTitle className="text-[14px] font-semibold text-white">Quick actions</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-2">
-              {[
-                { i: Search, t: "Find new leads", to: "/discovery" },
-                { i: Send, t: "Launch outreach", to: "/outreach" },
-                { i: Play, t: "Test AI response", to: "/brain" },
-                { i: Plus, t: "Create campaign", to: "/campaigns" },
-              ].map((a) => (
-                <Link key={a.t} to={a.to} className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[12.5px] font-medium transition hover:bg-white/10">
-                  <a.i className="h-3.5 w-3.5" />
-                  {a.t}
-                  <ArrowUpRight className="ml-auto h-3.5 w-3.5 opacity-60" />
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
+        {/* Quick actions */}
+        <Card className="rounded-2xl border-border/60 bg-gradient-to-br from-neutral-950 to-neutral-800 text-white shadow-none">
+          <CardContent className="grid grid-cols-2 gap-3 p-5 md:grid-cols-4">
+            {[
+              { i: Search, t: "Find new leads", to: "/discovery" },
+              { i: Send, t: "Launch outreach", to: "/outreach" },
+              { i: Play, t: "Test AI response", to: "/brain" },
+              { i: Zap, t: "Connect LinkedIn", to: "/integrations" },
+            ].map((a) => (
+              <Link key={a.t} to={a.to} className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-[12.5px] font-medium transition hover:bg-white/10">
+                <a.i className="h-3.5 w-3.5" />
+                {a.t}
+                <ArrowUpRight className="ml-auto h-3.5 w-3.5 opacity-60" />
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
+
