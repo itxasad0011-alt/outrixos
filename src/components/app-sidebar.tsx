@@ -129,7 +129,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <div className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-gradient-to-br from-neutral-900 to-neutral-700 text-[11px] text-white">
+            <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
               {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
             </AvatarFallback>
           </Avatar>
