@@ -79,8 +79,8 @@ function DiscoveryPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <div className="truncate text-[13.5px] font-semibold">{l.full_name}</div>
-                        <Badge className={`rounded-full text-[10.5px] ${l.icp_score >= 80 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : l.icp_score >= 60 ? "bg-blue-50 text-[#2563EB] border-blue-200" : "bg-muted text-muted-foreground"}`}>
-                          {l.icp_score}
+                        <Badge className={`rounded-full text-[10.5px] ${(l.icp_score ?? 0) >= 80 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (l.icp_score ?? 0) >= 60 ? "bg-blue-50 text-[#2563EB] border-blue-200" : "bg-muted text-muted-foreground"}`}>
+                          {l.icp_score ?? 0}
                         </Badge>
                       </div>
                       <div className="truncate text-[11.5px] text-muted-foreground">{l.headline || `${l.role} · ${l.company}`}</div>
