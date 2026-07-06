@@ -189,3 +189,11 @@ function timeAgo(iso: string) {
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
   return `${Math.floor(s / 86400)}d ago`;
 }
+function statusTint(s: string) {
+  return {
+    pending: "border-amber-200 bg-amber-50 text-amber-700",
+    executing: "border-blue-200 bg-blue-50 text-blue-700",
+    done: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    failed: "border-rose-200 bg-rose-50 text-rose-700",
+  }[s] ?? "";
+}
