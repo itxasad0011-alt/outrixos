@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_queue: {
+        Row: {
+          action_type: string
+          conversation_id: string | null
+          created_at: string
+          error: string | null
+          executed_at: string | null
+          id: string
+          lead_id: string | null
+          payload: Json
+          result: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          conversation_id?: string | null
+          created_at?: string
+          error?: string | null
+          executed_at?: string | null
+          id?: string
+          lead_id?: string | null
+          payload?: Json
+          result?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          conversation_id?: string | null
+          created_at?: string
+          error?: string | null
+          executed_at?: string | null
+          id?: string
+          lead_id?: string | null
+          payload?: Json
+          result?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_queue_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_queue_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_log: {
         Row: {
           created_at: string
@@ -452,6 +509,44 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          lead_id: string | null
+          payload: Json
+          processed: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          lead_id?: string | null
+          payload?: Json
+          processed?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          lead_id?: string | null
+          payload?: Json
+          processed?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
