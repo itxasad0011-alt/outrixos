@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
   MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, CalendarClock, Linkedin, Bell, LogOut,
+  BarChart3, Database, Plug, CreditCard, Bell, LogOut,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
