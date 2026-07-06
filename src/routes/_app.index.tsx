@@ -243,8 +243,3 @@ function Dashboard() {
   );
 }
 
-// keep unused imports satisfied
-void Circle;
-
-// Repeat icon alias (lucide has Repeat2)
-import { Repeat2 } from "lucide-react";
