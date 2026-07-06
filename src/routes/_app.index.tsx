@@ -9,9 +9,10 @@ import {
 } from "recharts";
 import {
   ArrowUpRight, Users, Send, MessageSquare, MessagesSquare, Sparkles,
-  Calendar, TrendingUp, Search, Plus, Filter, Play, Zap, UserCheck,
-  Reply, CalendarCheck, Circle,
+  Plus, Filter, Play, Zap, UserCheck, Reply, CalendarCheck, Search,
+  Repeat2, TrendingUp,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/")({
   component: Dashboard,
