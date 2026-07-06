@@ -60,8 +60,8 @@ const groups = [
   {
     label: "Settings",
     items: [
-      { title: "Integrations", url: "/integrations", icon: Plug },
-      { title: "Billing", url: "/billing", icon: CreditCard },
+      { title: "Calendly", url: "/integrations", icon: CalendarClock },
+      { title: "LinkedIn", url: "/billing", icon: Linkedin },
       { title: "Notifications", url: "/notifications", icon: Bell },
     ],
   },
