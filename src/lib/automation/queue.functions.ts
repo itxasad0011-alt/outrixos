@@ -139,8 +139,11 @@ export const runWorker = createServerFn({ method: "POST" })
   });
 
 // ---------- executor per action type ----------
+// deno-lint-ignore no-explicit-any
+type SupabaseLike = any;
+
 async function executeAction(
-  supabase: ReturnType<typeof getSupabase>,
+  supabase: SupabaseLike,
   userId: string,
   row: QueueRow,
 ): Promise<Record<string, unknown>> {
@@ -237,7 +240,7 @@ Return JSON: { "message": "..." }`;
         supabase.from("messages").select("*").eq("conversation_id", conversationId).order("created_at"),
       ]);
       if (!convo) throw new Error("Conversation missing");
-      const history = (msgs ?? []).map((m) => `${m.author === "lead" ? lead.full_name : "You"}: ${m.body}`).join("\n");
+      const history = (msgs ?? []).map((m: { author: string; body: string }) => `${m.author === "lead" ? lead.full_name : "You"}: ${m.body}`).join("\n");
       const calendly = profile?.calendly_url ?? null;
 
       const prompt = `You are ${profile?.full_name}'s AI sales agent handling a live LinkedIn thread.
