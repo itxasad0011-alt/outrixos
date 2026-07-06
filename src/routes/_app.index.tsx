@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Send, Reply, MessagesSquare, Sparkles, CalendarCheck, TrendingUp, Search, Zap } from "lucide-react";
+import { Users, Send, Reply, MessagesSquare, Sparkles, CalendarCheck, TrendingUp, Search, Zap, Play, Loader2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { runWorker } from "@/lib/automation/queue.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/")({ component: Dashboard });
 
@@ -35,6 +38,29 @@ function Dashboard() {
       };
     },
   });
+
+  const qc = useQueryClient();
+  const runWorkerFn = useServerFn(runWorker);
+  const workerMutation = useMutation({
+    mutationFn: () => runWorkerFn({ data: { limit: 5 } }),
+    onSuccess: (r) => {
+      toast.success(`Processed ${r.processed} action${r.processed === 1 ? "" : "s"}`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Worker failed"),
+  });
+
+  const { data: queue } = useQuery({
+    queryKey: ["action-queue"],
+    refetchInterval: 4000,
+    queryFn: async () => {
+      const { data } = await supabase.from("action_queue" as never)
+        .select("id, action_type, status, created_at, error")
+        .order("created_at", { ascending: false }).limit(8);
+      return (data ?? []) as unknown as { id: string; action_type: string; status: string; created_at: string; error: string | null }[];
+    },
+  });
+  const pendingCount = queue?.filter((q) => q.status === "pending").length ?? 0;
 
   const kpis: { label: string; value: string; icon: LucideIcon; tint: string }[] = [
     { label: "Leads Found", value: `${stats?.total ?? 0}`, icon: Users, tint: "bg-neutral-100 text-blue-600" },
@@ -70,6 +96,43 @@ function Dashboard() {
             </Card>
           ))}
         </div>
+
+        <Card className="rounded-2xl border-border/70">
+          <CardContent className="p-0">
+            <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+              <div className="flex items-center gap-2">
+                <div className="text-[14px] font-semibold">Automation Queue</div>
+                {pendingCount > 0 && (
+                  <Badge variant="outline" className="rounded-full text-[10px]">{pendingCount} pending</Badge>
+                )}
+              </div>
+              <Button
+                size="sm"
+                className="h-8 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
+                disabled={workerMutation.isPending || pendingCount === 0}
+                onClick={() => workerMutation.mutate()}
+              >
+                {workerMutation.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1.5 h-3.5 w-3.5" />}
+                Run worker
+              </Button>
+            </div>
+            {(queue?.length ?? 0) === 0 ? (
+              <div className="grid place-items-center py-10 text-[13px] text-muted-foreground">
+                No queued actions. Send outreach from a lead to enqueue commands.
+              </div>
+            ) : (
+              <div className="divide-y divide-border/60">
+                {queue!.map((q) => (
+                  <div key={q.id} className="flex items-center gap-3 px-5 py-2.5">
+                    <div className="font-mono text-[11px] text-muted-foreground">{q.action_type}</div>
+                    <Badge variant="outline" className={`ml-auto rounded-full text-[10px] ${statusTint(q.status)}`}>{q.status}</Badge>
+                    <div className="whitespace-nowrap text-[11px] text-muted-foreground">{timeAgo(q.created_at)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Card className="rounded-2xl border-border/70">
           <CardContent className="p-0">
@@ -125,4 +188,12 @@ function timeAgo(iso: string) {
   if (s < 3600) return `${Math.floor(s / 60)}m ago`;
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
   return `${Math.floor(s / 86400)}d ago`;
+}
+function statusTint(s: string) {
+  return {
+    pending: "border-amber-200 bg-amber-50 text-amber-700",
+    executing: "border-blue-200 bg-blue-50 text-blue-700",
+    done: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    failed: "border-rose-200 bg-rose-50 text-rose-700",
+  }[s] ?? "";
 }

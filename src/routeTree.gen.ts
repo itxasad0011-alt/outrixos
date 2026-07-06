@@ -30,6 +30,7 @@ import { Route as AppConversationsRouteImport } from './routes/_app.conversation
 import { Route as AppBrainRouteImport } from './routes/_app.brain'
 import { Route as AppBillingRouteImport } from './routes/_app.billing'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
+import { Route as ApiPublicWebhooksLinkedinRouteImport } from './routes/api/public/webhooks/linkedin'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -135,6 +136,12 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiPublicWebhooksLinkedinRoute =
+  ApiPublicWebhooksLinkedinRouteImport.update({
+    id: '/api/public/webhooks/linkedin',
+    path: '/api/public/webhooks/linkedin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/outreach': typeof AppOutreachRoute
   '/profile': typeof AppProfileRoute
   '/won': typeof AppWonRoute
+  '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/won': typeof AppWonRoute
   '/': typeof AppIndexRoute
+  '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,6 +212,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/won': typeof AppWonRoute
   '/_app/': typeof AppIndexRoute
+  '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/outreach'
     | '/profile'
     | '/won'
+    | '/api/public/webhooks/linkedin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/won'
     | '/'
+    | '/api/public/webhooks/linkedin'
   id:
     | '__root__'
     | '/_app'
@@ -272,11 +284,13 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/won'
     | '/_app/'
+    | '/api/public/webhooks/linkedin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicWebhooksLinkedinRoute: typeof ApiPublicWebhooksLinkedinRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -428,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/public/webhooks/linkedin': {
+      id: '/api/public/webhooks/linkedin'
+      path: '/api/public/webhooks/linkedin'
+      fullPath: '/api/public/webhooks/linkedin'
+      preLoaderRoute: typeof ApiPublicWebhooksLinkedinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -480,6 +501,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicWebhooksLinkedinRoute: ApiPublicWebhooksLinkedinRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
