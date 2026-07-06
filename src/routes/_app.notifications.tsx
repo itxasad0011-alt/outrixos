@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 
 export const Route = createFileRoute("/_app/notifications")({
-  component: Notifications;
+  component: Notifications,
 });
 
 const groups = [
