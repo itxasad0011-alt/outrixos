@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
   MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, CalendarClock, Linkedin, Bell, LogOut,
+  BarChart3, Database, Plug, CreditCard, Bell, LogOut,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -46,7 +46,7 @@ const groups = [
     items: [
       { title: "Interested", url: "/interested", icon: Sparkles },
       { title: "Meetings", url: "/meetings", icon: Calendar },
-      { title: "Won Clients", url: "/won", icon: Trophy },
+      { title: "Warm Clients", url: "/won", icon: Trophy },
       { title: "Not Interested", url: "/not-interested", icon: XCircle },
     ],
   },
@@ -60,8 +60,8 @@ const groups = [
   {
     label: "Settings",
     items: [
-      { title: "Calendly", url: "/integrations", icon: CalendarClock },
-      { title: "LinkedIn", url: "/billing", icon: Linkedin },
+      { title: "Integrations", url: "/integrations", icon: Plug },
+      { title: "Billing", url: "/billing", icon: CreditCard },
       { title: "Notifications", url: "/notifications", icon: Bell },
     ],
   },
