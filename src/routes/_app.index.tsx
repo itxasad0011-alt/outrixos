@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Send, Reply, MessagesSquare, Sparkles, CalendarCheck, TrendingUp, Search, Zap } from "lucide-react";
+import { Users, Send, Reply, MessagesSquare, Sparkles, CalendarCheck, TrendingUp, Search, Zap, Play, Loader2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { runWorker } from "@/lib/automation/queue.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/")({ component: Dashboard });
 
@@ -35,6 +38,29 @@ function Dashboard() {
       };
     },
   });
+
+  const qc = useQueryClient();
+  const runWorkerFn = useServerFn(runWorker);
+  const workerMutation = useMutation({
+    mutationFn: () => runWorkerFn({ data: { limit: 5 } }),
+    onSuccess: (r) => {
+      toast.success(`Processed ${r.processed} action${r.processed === 1 ? "" : "s"}`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Worker failed"),
+  });
+
+  const { data: queue } = useQuery({
+    queryKey: ["action-queue"],
+    refetchInterval: 4000,
+    queryFn: async () => {
+      const { data } = await supabase.from("action_queue" as never)
+        .select("id, action_type, status, created_at, error")
+        .order("created_at", { ascending: false }).limit(8);
+      return (data ?? []) as unknown as { id: string; action_type: string; status: string; created_at: string; error: string | null }[];
+    },
+  });
+  const pendingCount = queue?.filter((q) => q.status === "pending").length ?? 0;
 
   const kpis: { label: string; value: string; icon: LucideIcon; tint: string }[] = [
     { label: "Leads Found", value: `${stats?.total ?? 0}`, icon: Users, tint: "bg-neutral-100 text-blue-600" },
