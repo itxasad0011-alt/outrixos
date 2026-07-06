@@ -100,6 +100,43 @@ function Dashboard() {
         <Card className="rounded-2xl border-border/70">
           <CardContent className="p-0">
             <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+              <div className="flex items-center gap-2">
+                <div className="text-[14px] font-semibold">Automation Queue</div>
+                {pendingCount > 0 && (
+                  <Badge variant="outline" className="rounded-full text-[10px]">{pendingCount} pending</Badge>
+                )}
+              </div>
+              <Button
+                size="sm"
+                className="h-8 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
+                disabled={workerMutation.isPending || pendingCount === 0}
+                onClick={() => workerMutation.mutate()}
+              >
+                {workerMutation.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1.5 h-3.5 w-3.5" />}
+                Run worker
+              </Button>
+            </div>
+            {(queue?.length ?? 0) === 0 ? (
+              <div className="grid place-items-center py-10 text-[13px] text-muted-foreground">
+                No queued actions. Send outreach from a lead to enqueue commands.
+              </div>
+            ) : (
+              <div className="divide-y divide-border/60">
+                {queue!.map((q) => (
+                  <div key={q.id} className="flex items-center gap-3 px-5 py-2.5">
+                    <div className="font-mono text-[11px] text-muted-foreground">{q.action_type}</div>
+                    <Badge variant="outline" className={`ml-auto rounded-full text-[10px] ${statusTint(q.status)}`}>{q.status}</Badge>
+                    <div className="whitespace-nowrap text-[11px] text-muted-foreground">{timeAgo(q.created_at)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-border/70">
+          <CardContent className="p-0">
+            <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
               <div className="text-[14px] font-semibold">Live Agent Activity</div>
               <Badge className="rounded-full bg-emerald-50 text-emerald-700 border-emerald-200">
                 <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />Live
