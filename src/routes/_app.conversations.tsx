@@ -202,7 +202,11 @@ function ConvosPage() {
   const sendManual = useMutation({
     mutationFn: async (body: string) => {
       if (!active) throw new Error("no conversation");
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) throw new Error("not signed in");
       const { error } = await supabase.from("messages").insert({
+        user_id: uid,
         conversation_id: active.id,
         direction: "outbound",
         author: "user",
