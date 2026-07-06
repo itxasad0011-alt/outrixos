@@ -90,7 +90,7 @@ function KbPage() {
             <div className="flex flex-wrap gap-1.5">
               {KINDS.map((k) => (
                 <button key={k.id} onClick={() => setKind(k.id)}
-                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] ${kind === k.id ? "border-[#2563EB] bg-blue-50 text-[#2563EB]" : "border-border/70 bg-white text-muted-foreground"}`}>
+                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] ${kind === k.id ? "border-[#0A0A0A] bg-neutral-100 text-[#0A0A0A]" : "border-border/70 bg-white text-muted-foreground"}`}>
                   <k.icon className="h-3 w-3" />{k.label}
                 </button>
               ))}
@@ -101,7 +101,7 @@ function KbPage() {
               <Input value={url} onChange={(e) => setUrl(e.target.value)} className="h-9 rounded-lg" placeholder="https://…" /></div>
             <div className="space-y-1.5"><Label className="text-[12px]">Content (optional)</Label>
               <Textarea rows={4} value={content} onChange={(e) => setContent(e.target.value)} className="rounded-lg" placeholder="Paste text the AI can quote…" /></div>
-            <Button onClick={() => addM.mutate()} disabled={!title || addM.isPending} className="h-9 w-full rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]">
+            <Button onClick={() => addM.mutate()} disabled={!title || addM.isPending} className="h-9 w-full rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
               <Plus className="mr-1.5 h-3.5 w-3.5" />{addM.isPending ? "Adding…" : "Add item"}
             </Button>
           </CardContent>

@@ -73,14 +73,14 @@ function Analytics() {
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={weekly} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="a1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563EB" stopOpacity={0.3} /><stop offset="100%" stopColor="#2563EB" stopOpacity={0} /></linearGradient>
+                  <linearGradient id="a1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A0A0A" stopOpacity={0.3} /><stop offset="100%" stopColor="#0A0A0A" stopOpacity={0} /></linearGradient>
                   <linearGradient id="a2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10b981" stopOpacity={0.25} /><stop offset="100%" stopColor="#10b981" stopOpacity={0} /></linearGradient>
                 </defs>
                 <CartesianGrid vertical={false} stroke="oklch(0.94 0.005 260)" />
                 <XAxis dataKey="w" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }} />
-                <Area type="monotone" dataKey="connections" stroke="#2563EB" strokeWidth={2} fill="url(#a1)" />
+                <Area type="monotone" dataKey="connections" stroke="#0A0A0A" strokeWidth={2} fill="url(#a1)" />
                 <Area type="monotone" dataKey="accepted" stroke="#10b981" strokeWidth={2} fill="url(#a2)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -95,7 +95,7 @@ function Analytics() {
               return (
                 <div key={s.stage}>
                   <div className="mb-1 flex justify-between text-[12px]"><span className="font-medium">{s.stage}</span><span className="text-muted-foreground">{s.value.toLocaleString()}</span></div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-indigo-500" style={{ width: `${pct}%`, opacity: 1 - i * 0.08 }} /></div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-gradient-to-r from-[#0A0A0A] to-indigo-500" style={{ width: `${pct}%`, opacity: 1 - i * 0.08 }} /></div>
                 </div>
               );
             })}
@@ -111,7 +111,7 @@ function Analytics() {
                 <XAxis dataKey="w" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }} />
-                <Bar dataKey="meetings" fill="#2563EB" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="meetings" fill="#0A0A0A" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -127,7 +127,7 @@ function Analytics() {
                 <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }} />
                 <Line type="monotone" dataKey="won" stroke="#10b981" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="meetings" stroke="#2563EB" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="meetings" stroke="#0A0A0A" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -144,7 +144,7 @@ function Analytics() {
             ].map((f) => (
               <div key={f.l}>
                 <div className="mb-1 flex justify-between text-[12px]"><span className="font-medium">{f.l}</span><span className="text-muted-foreground">{f.v}%</span></div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-[#2563EB]" style={{ width: `${f.v * 2}%` }} /></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-[#0A0A0A]" style={{ width: `${f.v * 2}%` }} /></div>
               </div>
             ))}
           </CardContent>

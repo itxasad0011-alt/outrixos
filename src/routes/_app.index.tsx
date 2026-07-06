@@ -37,7 +37,7 @@ function Dashboard() {
   });
 
   const kpis: { label: string; value: string; icon: LucideIcon; tint: string }[] = [
-    { label: "Leads Found", value: `${stats?.total ?? 0}`, icon: Users, tint: "bg-blue-50 text-blue-600" },
+    { label: "Leads Found", value: `${stats?.total ?? 0}`, icon: Users, tint: "bg-neutral-100 text-blue-600" },
     { label: "Connections Sent", value: `${stats?.sent ?? 0}`, icon: Send, tint: "bg-indigo-50 text-indigo-600" },
     { label: "Reply Rate", value: `${stats?.replyRate ?? 0}%`, icon: Reply, tint: "bg-amber-50 text-amber-600" },
     { label: "Active Convos", value: `${stats?.replied ?? 0}`, icon: MessagesSquare, tint: "bg-cyan-50 text-cyan-600" },
@@ -54,7 +54,7 @@ function Dashboard() {
         actions={
           <>
             <Button asChild variant="outline" className="h-9 rounded-lg"><Link to="/discovery"><Search className="mr-1.5 h-3.5 w-3.5" />Discover leads</Link></Button>
-            <Button asChild className="h-9 rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]"><Link to="/brain"><Zap className="mr-1.5 h-3.5 w-3.5" />Sales Brain</Link></Button>
+            <Button asChild className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"><Link to="/brain"><Zap className="mr-1.5 h-3.5 w-3.5" />Sales Brain</Link></Button>
           </>
         }
       />
@@ -106,7 +106,7 @@ function Dashboard() {
 
 function kindTint(k: string) {
   return {
-    discovery: "bg-blue-50 text-blue-600",
+    discovery: "bg-neutral-100 text-blue-600",
     message: "bg-indigo-50 text-indigo-600",
     reply: "bg-amber-50 text-amber-600",
     meeting: "bg-emerald-50 text-emerald-600",

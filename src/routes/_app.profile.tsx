@@ -62,7 +62,7 @@ function ProfilePage() {
         <Card className="rounded-2xl border-border/70">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#0A66C2] text-white">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#0A0A0A] text-white">
                 <Linkedin className="h-4 w-4" />
               </div>
               <div>
@@ -92,7 +92,7 @@ function ProfilePage() {
             <Button
               onClick={() => runAnalyze.mutate()}
               disabled={runAnalyze.isPending}
-              className="h-9 w-full rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]"
+              className="h-9 w-full rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
             >
               <Sparkles className="mr-1.5 h-3.5 w-3.5" />
               {runAnalyze.isPending ? "Analyzing…" : connected ? "Re-analyze profile" : "Connect & analyze"}

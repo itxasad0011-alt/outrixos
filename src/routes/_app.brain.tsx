@@ -79,7 +79,7 @@ function BrainPage() {
             <Button variant="outline" onClick={() => savePrefs.mutate()} disabled={savePrefs.isPending} className="h-9 rounded-lg">
               {savePrefs.isPending ? "Saving…" : "Save preferences"}
             </Button>
-            <Button onClick={() => runGen.mutate()} disabled={runGen.isPending} className="h-9 rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]">
+            <Button onClick={() => runGen.mutate()} disabled={runGen.isPending} className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
               <Sparkles className="mr-1.5 h-3.5 w-3.5" />
               {runGen.isPending ? "Generating…" : "Generate Sales Brain"}
             </Button>
@@ -96,7 +96,7 @@ function BrainPage() {
               <div className="flex flex-wrap gap-2">
                 {TONES.map((t) => (
                   <button key={t} onClick={() => setTone(t)}
-                    className={`rounded-full border px-3 py-1 text-[12px] capitalize ${tone === t ? "border-[#2563EB] bg-blue-50 text-[#2563EB]" : "border-border/70 bg-white text-muted-foreground"}`}>
+                    className={`rounded-full border px-3 py-1 text-[12px] capitalize ${tone === t ? "border-[#0A0A0A] bg-neutral-100 text-[#0A0A0A]" : "border-border/70 bg-white text-muted-foreground"}`}>
                     {t}
                   </button>
                 ))}
@@ -118,7 +118,7 @@ function BrainPage() {
         <Card className="rounded-2xl border-border/70">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-neutral-700 text-white">
                 <Brain className="h-4 w-4" />
               </div>
               <div>

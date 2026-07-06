@@ -64,7 +64,7 @@ function AppLayout() {
               <Button variant="ghost" size="icon" className="rounded-xl">
                 <Bell className="h-4 w-4" />
               </Button>
-              <Button asChild size="sm" className="h-9 rounded-xl bg-[#2563EB] px-3 text-[12.5px] font-medium text-white hover:bg-[#1d4fd0]">
+              <Button asChild size="sm" className="h-9 rounded-xl bg-[#0A0A0A] px-3 text-[12.5px] font-medium text-white hover:bg-[#262626]">
                 <Link to="/profile">
                   <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Setup Agent
                 </Link>

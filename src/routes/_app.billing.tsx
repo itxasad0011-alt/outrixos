@@ -28,11 +28,11 @@ function Billing() {
       <PageHeader title="Billing" description="Manage your plan, payment method, and invoices." />
       <div className="grid grid-cols-1 gap-3 p-8 md:grid-cols-3">
         {plans.map((p) => (
-          <Card key={p.name} className={`rounded-2xl border-border/60 bg-white shadow-none ${p.current ? "ring-2 ring-[#2563EB]" : ""}`}>
+          <Card key={p.name} className={`rounded-2xl border-border/60 bg-white shadow-none ${p.current ? "ring-2 ring-[#0A0A0A]" : ""}`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="text-[15px] font-semibold">{p.name}</div>
-                {p.current && <Badge className="rounded-full bg-blue-50 text-[10px] text-blue-700 hover:bg-blue-50">Current</Badge>}
+                {p.current && <Badge className="rounded-full bg-neutral-100 text-[10px] text-blue-700 hover:bg-neutral-100">Current</Badge>}
               </div>
               <div className="mt-3 flex items-baseline gap-1">
                 <span className="text-[28px] font-semibold tracking-tight">{p.price}</span>
@@ -43,7 +43,7 @@ function Billing() {
                   <li key={f} className="flex items-start gap-2 text-[12.5px]"><CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />{f}</li>
                 ))}
               </ul>
-              <Button className={`mt-5 h-9 w-full rounded-xl text-[12.5px] ${p.current ? "bg-secondary text-foreground hover:bg-secondary" : "bg-[#2563EB] text-white hover:bg-[#1d4fd0]"}`}>{p.cta}</Button>
+              <Button className={`mt-5 h-9 w-full rounded-xl text-[12.5px] ${p.current ? "bg-secondary text-foreground hover:bg-secondary" : "bg-[#0A0A0A] text-white hover:bg-[#262626]"}`}>{p.cta}</Button>
             </CardContent>
           </Card>
         ))}

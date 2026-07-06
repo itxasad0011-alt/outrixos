@@ -10,11 +10,11 @@ export const Route = createFileRoute("/_app/integrations")({
 });
 
 const items = [
-  { name: "LinkedIn", desc: "Primary channel — required for the AI agent.", icon: Linkedin, tint: "bg-[#0A66C2] text-white", status: "Connected", primary: true },
+  { name: "LinkedIn", desc: "Primary channel — required for the AI agent.", icon: Linkedin, tint: "bg-[#0A0A0A] text-white", status: "Connected", primary: true },
   { name: "Google Calendar", desc: "Auto-book discovery calls and demos.", icon: Calendar, tint: "bg-red-500 text-white", status: "Connected" },
   { name: "Gmail", desc: "Send follow-ups by email when appropriate.", icon: Mail, tint: "bg-rose-500 text-white", status: "Not connected" },
   { name: "Slack", desc: "Get notified when leads reply or book meetings.", icon: Slack, tint: "bg-fuchsia-500 text-white", status: "Connected" },
-  { name: "Calendly", desc: "Share your Calendly link inside AI messages.", icon: Zap, tint: "bg-blue-500 text-white", status: "Not connected" },
+  { name: "Calendly", desc: "Share your Calendly link inside AI messages.", icon: Zap, tint: "bg-neutral-1000 text-white", status: "Not connected" },
   { name: "Chrome Extension", desc: "Add any LinkedIn profile to Relay with one click.", icon: Chrome, tint: "bg-neutral-900 text-white", status: "Not installed" },
 ];
 
@@ -32,14 +32,14 @@ function Integrations() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[14px] font-semibold">{i.name}</span>
-                    {i.primary && <Badge className="rounded-full bg-blue-50 text-[10px] text-blue-700 hover:bg-blue-50">Required</Badge>}
+                    {i.primary && <Badge className="rounded-full bg-neutral-100 text-[10px] text-blue-700 hover:bg-neutral-100">Required</Badge>}
                   </div>
                   <div className="text-[12px] text-muted-foreground">{i.desc}</div>
                 </div>
                 <Badge variant="secondary" className={`rounded-full text-[11px] ${connected ? "bg-emerald-50 text-emerald-700" : "bg-secondary text-muted-foreground"}`}>
                   {i.status}
                 </Badge>
-                <Button size="sm" variant={connected ? "outline" : "default"} className={connected ? "h-8 rounded-xl border-border/70 text-[12px]" : "h-8 rounded-xl bg-[#2563EB] text-[12px] hover:bg-[#1d4fd0]"}>
+                <Button size="sm" variant={connected ? "outline" : "default"} className={connected ? "h-8 rounded-xl border-border/70 text-[12px]" : "h-8 rounded-xl bg-[#0A0A0A] text-[12px] hover:bg-[#262626]"}>
                   {connected ? "Manage" : "Connect"}
                 </Button>
               </CardContent>

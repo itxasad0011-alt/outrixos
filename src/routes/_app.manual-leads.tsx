@@ -70,7 +70,7 @@ function ManualLeads() {
                 <Input value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="h-9 rounded-lg" />
               </div>
             ))}
-            <Button onClick={() => addM.mutate()} disabled={!f.full_name || addM.isPending} className="h-9 w-full rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]">
+            <Button onClick={() => addM.mutate()} disabled={!f.full_name || addM.isPending} className="h-9 w-full rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
               <Plus className="mr-1.5 h-3.5 w-3.5" />{addM.isPending ? "Adding…" : "Add lead"}
             </Button>
           </CardContent>

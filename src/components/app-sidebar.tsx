@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
   MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, Plug, CreditCard, Bell, LogOut,
+  BarChart3, Database, CalendarClock, Linkedin, Bell, LogOut,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -60,8 +60,8 @@ const groups = [
   {
     label: "Settings",
     items: [
-      { title: "Integrations", url: "/integrations", icon: Plug },
-      { title: "Billing", url: "/billing", icon: CreditCard },
+      { title: "Calendly", url: "/integrations", icon: CalendarClock },
+      { title: "LinkedIn", url: "/billing", icon: Linkedin },
       { title: "Notifications", url: "/notifications", icon: Bell },
     ],
   },
@@ -129,7 +129,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <div className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] text-white">
+            <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
               {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
             </AvatarFallback>
           </Avatar>
