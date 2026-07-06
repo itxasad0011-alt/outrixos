@@ -136,7 +136,7 @@ Return JSON:
 
     const result = await callJson<{
       messaging_strategy: string;
-      icp: unknown;
+      icp: Record<string, unknown>;
       conversation_rules: string;
       reply_strategy: string;
       followup_logic: string;
@@ -146,7 +146,7 @@ Return JSON:
     const upsert = {
       user_id: userId,
       messaging_strategy: result.messaging_strategy,
-      icp: result.icp,
+      icp: result.icp as never,
       conversation_rules: result.conversation_rules,
       reply_strategy: result.reply_strategy,
       followup_logic: result.followup_logic,
