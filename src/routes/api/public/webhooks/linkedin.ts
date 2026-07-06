@@ -41,13 +41,13 @@ export const Route = createFileRoute("/api/public/webhooks/linkedin")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         // Persist the raw event
-        await supabaseAdmin.from("webhook_events").insert({
+        const { data: eventRow } = await supabaseAdmin.from("webhook_events").insert({
           user_id: evt.user_id,
           lead_id: evt.lead_id ?? null,
           event_type: evt.event_type,
-          payload: evt.payload ?? {},
+          payload: (evt.payload ?? {}) as never,
           processed: false,
-        });
+        }).select("id").single();
 
         // Apply side effects based on event type
         if (evt.lead_id) {
@@ -97,15 +97,15 @@ export const Route = createFileRoute("/api/public/webhooks/linkedin")({
               await supabaseAdmin.from("action_queue").insert({
                 user_id: evt.user_id, lead_id: evt.lead_id, conversation_id: convo.id,
                 action_type: "AI_REPLY",
-                payload: { conversation_id: convo.id },
+                payload: { conversation_id: convo.id } as never,
               });
             }
           }
         }
 
-        await supabaseAdmin.from("webhook_events").update({ processed: true })
-          .eq("user_id", evt.user_id).eq("event_type", evt.event_type)
-          .order("created_at", { ascending: false }).limit(1);
+        if (eventRow?.id) {
+          await supabaseAdmin.from("webhook_events").update({ processed: true }).eq("id", eventRow.id);
+        }
 
         return Response.json({ ok: true });
       },
