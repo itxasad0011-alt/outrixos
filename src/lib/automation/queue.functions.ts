@@ -300,12 +300,6 @@ Return JSON:
   }
 }
 
-// tiny helper to type the supabase param
-type SupabaseCtx = Awaited<ReturnType<typeof getSupabase>>;
-function getSupabase() {
-  return null as unknown as import("@/integrations/supabase/auth-middleware").AuthedContext["supabase"];
-}
-void ({} as SupabaseCtx);
 
 // ============================================================
 // 4. Simulate inbound reply (dev helper — same effect as webhook)
