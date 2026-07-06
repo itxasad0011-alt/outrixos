@@ -165,7 +165,7 @@ function ConvosPage() {
   const { data: profile } = useQuery({
     queryKey: ["profile-calendly"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("calendly_url, full_name").maybeSingle();
+      const { data } = await supabase.from("profiles").select("full_name").maybeSingle();
       return data;
     },
   });
