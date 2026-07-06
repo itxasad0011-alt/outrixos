@@ -1,14 +1,17 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
   MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, Plug, CreditCard, Bell,
+  BarChart3, Database, Plug, CreditCard, Bell, LogOut,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 const groups = [
   {
@@ -67,6 +70,19 @@ const groups = [
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const isActive = (url: string) => (url === "/" ? pathname === "/" : pathname.startsWith(url));
+  const navigate = useNavigate();
+  const [user, setUser] = useState<{ email?: string; full_name?: string } | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: p } = await supabase.from("profiles").select("full_name").eq("id", data.user.id).maybeSingle();
+      setUser({ email: data.user.email, full_name: p?.full_name ?? undefined });
+    });
+  }, []);
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  }
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border/60">
@@ -113,12 +129,17 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <div className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] text-white">AM</AvatarFallback>
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] text-white">
+              {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-[12.5px] font-medium">Alex Morgan</div>
-            <div className="truncate text-[11px] text-muted-foreground">Pro · Acme Studio</div>
+            <div className="truncate text-[12.5px] font-medium">{user?.full_name ?? "Signed in"}</div>
+            <div className="truncate text-[11px] text-muted-foreground">{user?.email}</div>
           </div>
+          <Button variant="ghost" size="icon" onClick={signOut} className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" title="Sign out">
+            <LogOut className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>

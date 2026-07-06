@@ -1,67 +1,121 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { analyzeProfile } from "@/lib/ai/agent.functions";
 import { PageHeader } from "@/components/page-header";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Linkedin, CheckCircle2, Sparkles, Edit3, RefreshCw } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Linkedin, Sparkles, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/profile")({
-  component: Profile,
-});
+export const Route = createFileRoute("/_app/profile")({ component: ProfilePage });
 
-function Profile() {
+function ProfilePage() {
+  const qc = useQueryClient();
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const { data } = await supabase.from("profiles").select("*").eq("id", u.user.id).maybeSingle();
+      return data;
+    },
+  });
+
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [headline, setHeadline] = useState("");
+  const [about, setAbout] = useState("");
+
+  const analyze = useServerFn(analyzeProfile);
+  const runAnalyze = useMutation({
+    mutationFn: () => analyze({
+      data: {
+        linkedin_url: linkedinUrl || undefined,
+        full_name: fullName || profile?.full_name || undefined,
+        headline: headline || undefined,
+        about: about || undefined,
+      },
+    }),
+    onSuccess: () => {
+      toast.success("Profile analyzed. AI extracted your ICP.");
+      qc.invalidateQueries({ queryKey: ["profile"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const connected = profile?.linkedin_connected;
+
   return (
     <div>
       <PageHeader
         title="Profile"
-        description="Everything the AI knows about you and your business — auto-extracted from LinkedIn."
-        actions={
-          <>
-            <Button variant="outline" className="h-9 rounded-xl border-border/70 bg-white text-[12.5px]"><RefreshCw className="mr-1.5 h-3.5 w-3.5" />Re-scan LinkedIn</Button>
-            <Button asChild className="h-9 rounded-xl bg-[#2563EB] text-[12.5px] hover:bg-[#1d4fd0]"><Link to="/brain"><Sparkles className="mr-1.5 h-3.5 w-3.5" />Refine in AI Brain</Link></Button>
-          </>
-        }
+        description="Connect LinkedIn. AI extracts your services, industry, target audience and value prop automatically."
       />
-      <div className="grid grid-cols-1 gap-4 p-8 lg:grid-cols-[360px_1fr]">
-        <Card className="h-fit rounded-2xl border-border/60 bg-white shadow-none">
-          <CardContent className="p-6 text-center">
-            <Avatar className="mx-auto h-20 w-20"><AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[18px] text-white">AM</AvatarFallback></Avatar>
-            <div className="mt-4 text-[16px] font-semibold">Alex Morgan</div>
-            <div className="text-[12.5px] text-muted-foreground">Founder · Acme Studio</div>
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
-              <CheckCircle2 className="h-3 w-3" /> LinkedIn connected
+      <div className="grid gap-6 px-8 py-6 xl:grid-cols-2">
+        <Card className="rounded-2xl border-border/70">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#0A66C2] text-white">
+                <Linkedin className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-[14px] font-semibold">LinkedIn</div>
+                <div className="text-[11.5px] text-muted-foreground">{connected ? "Connected · analyzed" : "Simulated connection"}</div>
+              </div>
             </div>
-            <div className="mt-5 rounded-xl border border-border/60 bg-secondary/40 p-3 text-left">
-              <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-blue-700"><Linkedin className="h-3 w-3" /> linkedin.com/in/alexmorgan</div>
-              <div className="text-[11.5px] text-muted-foreground">Last synced 2 minutes ago</div>
+            {connected && <Badge className="rounded-full bg-emerald-50 text-emerald-700 border-emerald-200"><CheckCircle2 className="h-3 w-3 mr-1" />Live</Badge>}
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">Full name</Label>
+              <Input value={fullName || profile?.full_name || ""} onChange={(e) => setFullName(e.target.value)} className="h-9 rounded-lg" placeholder="Alex Morgan" />
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">LinkedIn URL</Label>
+              <Input value={linkedinUrl || profile?.linkedin_url || ""} onChange={(e) => setLinkedinUrl(e.target.value)} className="h-9 rounded-lg" placeholder="https://linkedin.com/in/…" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">Headline</Label>
+              <Input value={headline || profile?.headline || ""} onChange={(e) => setHeadline(e.target.value)} className="h-9 rounded-lg" placeholder="Founder @ Acme · Helping SaaS companies…" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px]">About</Label>
+              <Textarea value={about || profile?.about || ""} onChange={(e) => setAbout(e.target.value)} rows={5} className="rounded-lg" placeholder="Paste your LinkedIn About section…" />
+            </div>
+            <Button
+              onClick={() => runAnalyze.mutate()}
+              disabled={runAnalyze.isPending}
+              className="h-9 w-full rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]"
+            >
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+              {runAnalyze.isPending ? "Analyzing…" : connected ? "Re-analyze profile" : "Connect & analyze"}
+            </Button>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-border/60 bg-white shadow-none">
-          <CardContent className="space-y-5 p-6">
-            <div className="mb-2 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#2563EB]" />
-              <span className="text-[13px] font-semibold">AI-generated profile</span>
-              <Badge variant="secondary" className="ml-auto rounded-full bg-blue-50 text-[10.5px] text-blue-700">Editable</Badge>
-            </div>
-
-            <Field label="Headline" defaultValue="Founder at Acme Studio — beautiful brands that convert" />
-            <Field label="Industry" defaultValue="Design & Creative Services" />
-            <Field label="Services" defaultValue="Brand design, product design, growth consulting" />
-            <FieldArea label="Experience" defaultValue="12 years · Founder at Acme Studio, ex-Airbnb Design, ex-Stripe Brand" />
-            <Field label="Skills" defaultValue="Product strategy · Brand systems · GTM design · Motion" />
-            <FieldArea label="Ideal Customer Profile" defaultValue="Series A–C SaaS founders and heads of growth · 20–200 employees · US / EU · shipping product ≥ 2 years" />
-            <FieldArea label="Value proposition" defaultValue="We ship beautiful brands that convert — in 6 weeks, not 6 months." />
-            <Field label="Target audience" defaultValue="Founders, CROs, Heads of Growth" />
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" className="h-9 rounded-xl border-border/70 text-[12.5px]"><Edit3 className="mr-1.5 h-3.5 w-3.5" />Edit</Button>
-              <Button className="h-9 rounded-xl bg-[#2563EB] text-[12.5px] hover:bg-[#1d4fd0]">Save changes</Button>
-            </div>
+        <Card className="rounded-2xl border-border/70">
+          <CardHeader className="pb-3">
+            <div className="text-[14px] font-semibold">AI Intelligence</div>
+            <div className="text-[11.5px] text-muted-foreground">Extracted from your profile</div>
+          </CardHeader>
+          <CardContent className="space-y-4 text-[13px]">
+            <Field label="Industry" value={profile?.industry} />
+            <Field label="Services" value={profile?.services?.join(" · ")} />
+            <Field label="Target Audience" value={profile?.target_audience} />
+            <Field label="Value Proposition" value={profile?.value_proposition} />
+            <Field label="Experience" value={profile?.experience_years ? `${profile.experience_years} years` : undefined} />
+            {!connected && (
+              <div className="rounded-xl border border-dashed border-border/70 p-4 text-center text-[12px] text-muted-foreground">
+                Fill your details and click Connect & analyze — the AI will populate your ICP.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -69,19 +123,11 @@ function Profile() {
   );
 }
 
-function Field({ label, defaultValue }: { label: string; defaultValue: string }) {
+function Field({ label, value }: { label: string; value?: string | null }) {
   return (
     <div>
-      <label className="mb-1.5 block text-[11.5px] font-medium text-muted-foreground">{label}</label>
-      <Input defaultValue={defaultValue} className="h-9 rounded-xl border-border/70 text-[13px]" />
-    </div>
-  );
-}
-function FieldArea({ label, defaultValue }: { label: string; defaultValue: string }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-[11.5px] font-medium text-muted-foreground">{label}</label>
-      <Textarea rows={2} defaultValue={defaultValue} className="rounded-xl border-border/70 text-[13px]" />
+      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">{label}</div>
+      <div className="mt-0.5 text-foreground">{value || <span className="text-muted-foreground/60">—</span>}</div>
     </div>
   );
 }
