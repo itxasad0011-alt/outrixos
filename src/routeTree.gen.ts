@@ -9,61 +9,352 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppTeamRouteImport } from './routes/_app.team'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppQueueRouteImport } from './routes/_app.queue'
+import { Route as AppOutreachRouteImport } from './routes/_app.outreach'
+import { Route as AppOnboardingRouteImport } from './routes/_app.onboarding'
+import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
+import { Route as AppKnowledgeRouteImport } from './routes/_app.knowledge'
+import { Route as AppDiscoveryRouteImport } from './routes/_app.discovery'
+import { Route as AppCrmRouteImport } from './routes/_app.crm'
+import { Route as AppConversationsRouteImport } from './routes/_app.conversations'
+import { Route as AppCampaignsRouteImport } from './routes/_app.campaigns'
+import { Route as AppBrainRouteImport } from './routes/_app.brain'
+import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQueueRoute = AppQueueRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOutreachRoute = AppOutreachRouteImport.update({
+  id: '/outreach',
+  path: '/outreach',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOnboardingRoute = AppOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMeetingsRoute = AppMeetingsRouteImport.update({
+  id: '/meetings',
+  path: '/meetings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppKnowledgeRoute = AppKnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDiscoveryRoute = AppDiscoveryRouteImport.update({
+  id: '/discovery',
+  path: '/discovery',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCrmRoute = AppCrmRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConversationsRoute = AppConversationsRouteImport.update({
+  id: '/conversations',
+  path: '/conversations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCampaignsRoute = AppCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBrainRoute = AppBrainRouteImport.update({
+  id: '/brain',
+  path: '/brain',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/brain': typeof AppBrainRoute
+  '/campaigns': typeof AppCampaignsRoute
+  '/conversations': typeof AppConversationsRoute
+  '/crm': typeof AppCrmRoute
+  '/discovery': typeof AppDiscoveryRoute
+  '/knowledge': typeof AppKnowledgeRoute
+  '/meetings': typeof AppMeetingsRoute
+  '/onboarding': typeof AppOnboardingRoute
+  '/outreach': typeof AppOutreachRoute
+  '/queue': typeof AppQueueRoute
+  '/settings': typeof AppSettingsRoute
+  '/team': typeof AppTeamRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/brain': typeof AppBrainRoute
+  '/campaigns': typeof AppCampaignsRoute
+  '/conversations': typeof AppConversationsRoute
+  '/crm': typeof AppCrmRoute
+  '/discovery': typeof AppDiscoveryRoute
+  '/knowledge': typeof AppKnowledgeRoute
+  '/meetings': typeof AppMeetingsRoute
+  '/onboarding': typeof AppOnboardingRoute
+  '/outreach': typeof AppOutreachRoute
+  '/queue': typeof AppQueueRoute
+  '/settings': typeof AppSettingsRoute
+  '/team': typeof AppTeamRoute
+  '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/analytics': typeof AppAnalyticsRoute
+  '/_app/brain': typeof AppBrainRoute
+  '/_app/campaigns': typeof AppCampaignsRoute
+  '/_app/conversations': typeof AppConversationsRoute
+  '/_app/crm': typeof AppCrmRoute
+  '/_app/discovery': typeof AppDiscoveryRoute
+  '/_app/knowledge': typeof AppKnowledgeRoute
+  '/_app/meetings': typeof AppMeetingsRoute
+  '/_app/onboarding': typeof AppOnboardingRoute
+  '/_app/outreach': typeof AppOutreachRoute
+  '/_app/queue': typeof AppQueueRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/team': typeof AppTeamRoute
+  '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/brain'
+    | '/campaigns'
+    | '/conversations'
+    | '/crm'
+    | '/discovery'
+    | '/knowledge'
+    | '/meetings'
+    | '/onboarding'
+    | '/outreach'
+    | '/queue'
+    | '/settings'
+    | '/team'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/analytics'
+    | '/brain'
+    | '/campaigns'
+    | '/conversations'
+    | '/crm'
+    | '/discovery'
+    | '/knowledge'
+    | '/meetings'
+    | '/onboarding'
+    | '/outreach'
+    | '/queue'
+    | '/settings'
+    | '/team'
+    | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_app/analytics'
+    | '/_app/brain'
+    | '/_app/campaigns'
+    | '/_app/conversations'
+    | '/_app/crm'
+    | '/_app/discovery'
+    | '/_app/knowledge'
+    | '/_app/meetings'
+    | '/_app/onboarding'
+    | '/_app/outreach'
+    | '/_app/queue'
+    | '/_app/settings'
+    | '/_app/team'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/team': {
+      id: '/_app/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AppTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/queue': {
+      id: '/_app/queue'
+      path: '/queue'
+      fullPath: '/queue'
+      preLoaderRoute: typeof AppQueueRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/outreach': {
+      id: '/_app/outreach'
+      path: '/outreach'
+      fullPath: '/outreach'
+      preLoaderRoute: typeof AppOutreachRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/onboarding': {
+      id: '/_app/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/meetings': {
+      id: '/_app/meetings'
+      path: '/meetings'
+      fullPath: '/meetings'
+      preLoaderRoute: typeof AppMeetingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/knowledge': {
+      id: '/_app/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof AppKnowledgeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/discovery': {
+      id: '/_app/discovery'
+      path: '/discovery'
+      fullPath: '/discovery'
+      preLoaderRoute: typeof AppDiscoveryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/crm': {
+      id: '/_app/crm'
+      path: '/crm'
+      fullPath: '/crm'
+      preLoaderRoute: typeof AppCrmRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/conversations': {
+      id: '/_app/conversations'
+      path: '/conversations'
+      fullPath: '/conversations'
+      preLoaderRoute: typeof AppConversationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/campaigns': {
+      id: '/_app/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof AppCampaignsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/brain': {
+      id: '/_app/brain'
+      path: '/brain'
+      fullPath: '/brain'
+      preLoaderRoute: typeof AppBrainRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/analytics': {
+      id: '/_app/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppBrainRoute: typeof AppBrainRoute
+  AppCampaignsRoute: typeof AppCampaignsRoute
+  AppConversationsRoute: typeof AppConversationsRoute
+  AppCrmRoute: typeof AppCrmRoute
+  AppDiscoveryRoute: typeof AppDiscoveryRoute
+  AppKnowledgeRoute: typeof AppKnowledgeRoute
+  AppMeetingsRoute: typeof AppMeetingsRoute
+  AppOnboardingRoute: typeof AppOnboardingRoute
+  AppOutreachRoute: typeof AppOutreachRoute
+  AppQueueRoute: typeof AppQueueRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppTeamRoute: typeof AppTeamRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAnalyticsRoute: AppAnalyticsRoute,
+  AppBrainRoute: AppBrainRoute,
+  AppCampaignsRoute: AppCampaignsRoute,
+  AppConversationsRoute: AppConversationsRoute,
+  AppCrmRoute: AppCrmRoute,
+  AppDiscoveryRoute: AppDiscoveryRoute,
+  AppKnowledgeRoute: AppKnowledgeRoute,
+  AppMeetingsRoute: AppMeetingsRoute,
+  AppOnboardingRoute: AppOnboardingRoute,
+  AppOutreachRoute: AppOutreachRoute,
+  AppQueueRoute: AppQueueRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppTeamRoute: AppTeamRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
