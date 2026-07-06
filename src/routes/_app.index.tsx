@@ -38,7 +38,7 @@ const kpis = [
   { label: "Conversion Rate", value: "3.4%", delta: "+0.4%", icon: TrendingUp, tint: "bg-rose-50 text-rose-600" },
 ];
 
-type FeedItem = { icon: React.ElementType; text: string; time: string; tint: string };
+type FeedItem = { icon: LucideIcon; text: string; time: string; tint: string };
 const feed: FeedItem[] = [
   { icon: CalendarCheck, text: "Meeting booked with Sarah Chen · Loom · Tue 10:00", time: "2m", tint: "text-emerald-600 bg-emerald-50" },
   { icon: Reply, text: "Reply received from Marcus Reed · VP Sales @ Ramp", time: "8m", tint: "text-blue-600 bg-blue-50" },
