@@ -98,7 +98,7 @@ function AuthPage() {
                 <Label className="text-[12px]">Password</Label>
                 <Input type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-9 rounded-lg" />
               </div>
-              <Button type="submit" disabled={loading} className="h-9 w-full rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]">
+              <Button type="submit" disabled={loading} className="h-9 w-full rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
                 {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
               </Button>
             </form>

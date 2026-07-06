@@ -29,7 +29,7 @@ function Onboarding() {
 
       <Card className="mb-4 rounded-2xl border-border/60 bg-white shadow-none">
         <CardContent className="flex items-center gap-4 p-5">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#0A66C2] text-white"><Linkedin className="h-5 w-5" /></div>
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#0A0A0A] text-white"><Linkedin className="h-5 w-5" /></div>
           <div className="flex-1">
             <div className="text-[14px] font-semibold">LinkedIn connected</div>
             <div className="text-[12px] text-muted-foreground">Alex Morgan · Founder at Acme Studio</div>
@@ -41,9 +41,9 @@ function Onboarding() {
       <Card className="mb-4 rounded-2xl border-border/60 bg-white shadow-none">
         <CardContent className="p-6">
           <div className="mb-2 flex items-center gap-2">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-[#2563EB]" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-[#0A0A0A]" />
             <span className="text-[13px] font-semibold">AI scanning your profile…</span>
-            <span className="ml-auto text-[12px] font-medium text-[#2563EB]">86%</span>
+            <span className="ml-auto text-[12px] font-medium text-[#0A0A0A]">86%</span>
           </div>
           <Progress value={86} className="h-1.5" />
           <div className="mt-4 text-[12px] text-muted-foreground">Reading your headline, experience, posts, and connections to build your Sales Brain.</div>
@@ -70,7 +70,7 @@ function Onboarding() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild className="h-9 rounded-xl border-border/70 text-[12.5px]"><Link to="/">Skip for now</Link></Button>
-          <Button asChild className="h-9 rounded-xl bg-[#2563EB] text-[12.5px] hover:bg-[#1d4fd0]"><Link to="/brain">Continue <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link></Button>
+          <Button asChild className="h-9 rounded-xl bg-[#0A0A0A] text-[12.5px] hover:bg-[#262626]"><Link to="/brain">Continue <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link></Button>
         </div>
       </div>
     </div>

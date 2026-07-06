@@ -47,7 +47,7 @@ function DiscoveryPage() {
         title="Lead Discovery"
         description="AI finds prospects matching your ICP — from your Sales Brain."
         actions={
-          <Button onClick={() => discoverM.mutate()} disabled={discoverM.isPending} className="h-9 rounded-lg bg-[#2563EB] hover:bg-[#1d4fd0]">
+          <Button onClick={() => discoverM.mutate()} disabled={discoverM.isPending} className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
             <Sparkles className="mr-1.5 h-3.5 w-3.5" />
             {discoverM.isPending ? "Discovering…" : "Discover leads"}
           </Button>
@@ -61,7 +61,7 @@ function DiscoveryPage() {
               <div className="text-[14px] font-medium">No leads yet</div>
               <div className="max-w-sm text-[12.5px] text-muted-foreground">
                 Complete your profile and generate a Sales Brain, then click Discover.{" "}
-                <Link to="/profile" className="text-[#2563EB]">Set up profile →</Link>
+                <Link to="/profile" className="text-[#0A0A0A]">Set up profile →</Link>
               </div>
             </CardContent>
           </Card>
@@ -72,14 +72,14 @@ function DiscoveryPage() {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[12px] text-white">
+                      <AvatarFallback className="bg-gradient-to-br from-neutral-900 to-neutral-700 text-[12px] text-white">
                         {l.full_name.split(" ").map((s) => s[0]).slice(0, 2).join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <div className="truncate text-[13.5px] font-semibold">{l.full_name}</div>
-                        <Badge className={`rounded-full text-[10.5px] ${(l.icp_score ?? 0) >= 80 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (l.icp_score ?? 0) >= 60 ? "bg-blue-50 text-[#2563EB] border-blue-200" : "bg-muted text-muted-foreground"}`}>
+                        <Badge className={`rounded-full text-[10.5px] ${(l.icp_score ?? 0) >= 80 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (l.icp_score ?? 0) >= 60 ? "bg-neutral-100 text-[#0A0A0A] border-neutral-200" : "bg-muted text-muted-foreground"}`}>
                           {l.icp_score ?? 0}
                         </Badge>
                       </div>
@@ -91,7 +91,7 @@ function DiscoveryPage() {
                     <Badge variant="secondary" className="rounded-full text-[10.5px] capitalize">{l.status}</Badge>
                     {l.status === "qualified" && (
                       <Button size="sm" onClick={() => outreachM.mutate(l.id)} disabled={outreachM.isPending}
-                        className="ml-auto h-7 rounded-lg bg-[#2563EB] px-2.5 text-[11.5px] hover:bg-[#1d4fd0]">
+                        className="ml-auto h-7 rounded-lg bg-[#0A0A0A] px-2.5 text-[11.5px] hover:bg-[#262626]">
                         <Send className="mr-1 h-3 w-3" /> Send intro
                       </Button>
                     )}

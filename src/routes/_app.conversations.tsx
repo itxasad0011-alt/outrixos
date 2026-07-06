@@ -72,9 +72,9 @@ function ConvosPage() {
               <div className="divide-y divide-border/60">
                 {convos!.map((c) => (
                   <button key={c.id} onClick={() => setActiveId(c.id)}
-                    className={`flex w-full items-start gap-3 px-4 py-3 text-left ${active?.id === c.id ? "bg-blue-50/50" : "hover:bg-secondary/40"}`}>
+                    className={`flex w-full items-start gap-3 px-4 py-3 text-left ${active?.id === c.id ? "bg-neutral-100/60" : "hover:bg-secondary/40"}`}>
                     <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] text-white">
+                      <AvatarFallback className="bg-gradient-to-br from-neutral-900 to-neutral-700 text-[11px] text-white">
                         {c.lead?.full_name.split(" ").map((s) => s[0]).slice(0, 2).join("") ?? "?"}
                       </AvatarFallback>
                     </Avatar>
@@ -102,7 +102,7 @@ function ConvosPage() {
               <>
                 <div className="flex items-center gap-3 border-b border-border/60 px-5 py-3">
                   <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] text-white">
+                    <AvatarFallback className="bg-gradient-to-br from-neutral-900 to-neutral-700 text-[11px] text-white">
                       {active.lead?.full_name.split(" ").map((s) => s[0]).slice(0, 2).join("") ?? "?"}
                     </AvatarFallback>
                   </Avatar>
@@ -111,7 +111,7 @@ function ConvosPage() {
                     <div className="truncate text-[11.5px] text-muted-foreground">{active.lead?.headline}</div>
                   </div>
                   <Button size="sm" onClick={() => simulateM.mutate()} disabled={simulateM.isPending}
-                    className="h-8 rounded-lg bg-[#2563EB] text-[11.5px] hover:bg-[#1d4fd0]">
+                    className="h-8 rounded-lg bg-[#0A0A0A] text-[11.5px] hover:bg-[#262626]">
                     <Sparkles className="mr-1 h-3 w-3" />
                     {simulateM.isPending ? "Thinking…" : "Simulate reply"}
                   </Button>
@@ -121,7 +121,7 @@ function ConvosPage() {
                     const mine = m.direction === "outbound";
                     return (
                       <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-[13px] ${mine ? "bg-[#2563EB] text-white" : "bg-secondary"}`}>
+                        <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-[13px] ${mine ? "bg-[#0A0A0A] text-white" : "bg-secondary"}`}>
                           {m.kind && m.kind !== "chat" && (
                             <div className={`mb-1 text-[10px] uppercase tracking-wide ${mine ? "text-white/70" : "text-muted-foreground"}`}>
                               {m.kind.replace("_", " ")}

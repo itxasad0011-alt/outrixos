@@ -38,7 +38,7 @@ function Outreach() {
       <div className="grid gap-6 px-8 py-6 xl:grid-cols-2">
         <Column title="Ready to send" leads={queued} action={(l) => (
           <Button size="sm" disabled={outM.isPending} onClick={() => outM.mutate(l.id)}
-            className="h-7 rounded-lg bg-[#2563EB] px-2.5 text-[11.5px] hover:bg-[#1d4fd0]"><Send className="mr-1 h-3 w-3" /> Send</Button>
+            className="h-7 rounded-lg bg-[#0A0A0A] px-2.5 text-[11.5px] hover:bg-[#262626]"><Send className="mr-1 h-3 w-3" /> Send</Button>
         )} />
         <Column title="Already contacted" leads={sent} />
       </div>
