@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppOutreachRouteImport } from './routes/_app.outreach'
 import { Route as AppOnboardingRouteImport } from './routes/_app.onboarding'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
+import { Route as AppManualLeadsRouteImport } from './routes/_app.manual-leads'
 import { Route as AppKnowledgeRouteImport } from './routes/_app.knowledge'
+import { Route as AppFollowupsRouteImport } from './routes/_app.followups'
 import { Route as AppDiscoveryRouteImport } from './routes/_app.discovery'
 import { Route as AppConversationsRouteImport } from './routes/_app.conversations'
 import { Route as AppBrainRouteImport } from './routes/_app.brain'
@@ -27,6 +30,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOutreachRoute = AppOutreachRouteImport.update({
@@ -44,9 +52,19 @@ const AppMeetingsRoute = AppMeetingsRouteImport.update({
   path: '/meetings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppManualLeadsRoute = AppManualLeadsRouteImport.update({
+  id: '/manual-leads',
+  path: '/manual-leads',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppKnowledgeRoute = AppKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFollowupsRoute = AppFollowupsRouteImport.update({
+  id: '/followups',
+  path: '/followups',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDiscoveryRoute = AppDiscoveryRouteImport.update({
@@ -76,20 +94,26 @@ export interface FileRoutesByFullPath {
   '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
+  '/followups': typeof AppFollowupsRoute
   '/knowledge': typeof AppKnowledgeRoute
+  '/manual-leads': typeof AppManualLeadsRoute
   '/meetings': typeof AppMeetingsRoute
   '/onboarding': typeof AppOnboardingRoute
   '/outreach': typeof AppOutreachRoute
+  '/profile': typeof AppProfileRoute
 }
 export interface FileRoutesByTo {
   '/analytics': typeof AppAnalyticsRoute
   '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
+  '/followups': typeof AppFollowupsRoute
   '/knowledge': typeof AppKnowledgeRoute
+  '/manual-leads': typeof AppManualLeadsRoute
   '/meetings': typeof AppMeetingsRoute
   '/onboarding': typeof AppOnboardingRoute
   '/outreach': typeof AppOutreachRoute
+  '/profile': typeof AppProfileRoute
   '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -99,10 +123,13 @@ export interface FileRoutesById {
   '/_app/brain': typeof AppBrainRoute
   '/_app/conversations': typeof AppConversationsRoute
   '/_app/discovery': typeof AppDiscoveryRoute
+  '/_app/followups': typeof AppFollowupsRoute
   '/_app/knowledge': typeof AppKnowledgeRoute
+  '/_app/manual-leads': typeof AppManualLeadsRoute
   '/_app/meetings': typeof AppMeetingsRoute
   '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/outreach': typeof AppOutreachRoute
+  '/_app/profile': typeof AppProfileRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -113,20 +140,26 @@ export interface FileRouteTypes {
     | '/brain'
     | '/conversations'
     | '/discovery'
+    | '/followups'
     | '/knowledge'
+    | '/manual-leads'
     | '/meetings'
     | '/onboarding'
     | '/outreach'
+    | '/profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/analytics'
     | '/brain'
     | '/conversations'
     | '/discovery'
+    | '/followups'
     | '/knowledge'
+    | '/manual-leads'
     | '/meetings'
     | '/onboarding'
     | '/outreach'
+    | '/profile'
     | '/'
   id:
     | '__root__'
@@ -135,10 +168,13 @@ export interface FileRouteTypes {
     | '/_app/brain'
     | '/_app/conversations'
     | '/_app/discovery'
+    | '/_app/followups'
     | '/_app/knowledge'
+    | '/_app/manual-leads'
     | '/_app/meetings'
     | '/_app/onboarding'
     | '/_app/outreach'
+    | '/_app/profile'
     | '/_app/'
   fileRoutesById: FileRoutesById
 }
@@ -162,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/outreach': {
       id: '/_app/outreach'
       path: '/outreach'
@@ -183,11 +226,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeetingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/manual-leads': {
+      id: '/_app/manual-leads'
+      path: '/manual-leads'
+      fullPath: '/manual-leads'
+      preLoaderRoute: typeof AppManualLeadsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/knowledge': {
       id: '/_app/knowledge'
       path: '/knowledge'
       fullPath: '/knowledge'
       preLoaderRoute: typeof AppKnowledgeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/followups': {
+      id: '/_app/followups'
+      path: '/followups'
+      fullPath: '/followups'
+      preLoaderRoute: typeof AppFollowupsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/discovery': {
@@ -226,10 +283,13 @@ interface AppRouteChildren {
   AppBrainRoute: typeof AppBrainRoute
   AppConversationsRoute: typeof AppConversationsRoute
   AppDiscoveryRoute: typeof AppDiscoveryRoute
+  AppFollowupsRoute: typeof AppFollowupsRoute
   AppKnowledgeRoute: typeof AppKnowledgeRoute
+  AppManualLeadsRoute: typeof AppManualLeadsRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppOutreachRoute: typeof AppOutreachRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -238,10 +298,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppBrainRoute: AppBrainRoute,
   AppConversationsRoute: AppConversationsRoute,
   AppDiscoveryRoute: AppDiscoveryRoute,
+  AppFollowupsRoute: AppFollowupsRoute,
   AppKnowledgeRoute: AppKnowledgeRoute,
+  AppManualLeadsRoute: AppManualLeadsRoute,
   AppMeetingsRoute: AppMeetingsRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppOutreachRoute: AppOutreachRoute,
+  AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
