@@ -243,7 +243,8 @@ function ConvosPage() {
   const nba = nextBestAction(active, messages ?? []);
   const objection = detectObjection(messages ?? []);
   const replies = draftReplies(active, messages ?? []);
-  const calendly = profile?.calendly_url ?? "https://calendly.com/your-link";
+  const calendly = "https://calendly.com/your-link";
+  void profile;
 
   function useReply(text: string) {
     setComposer(text.replaceAll("{calendly}", calendly));
