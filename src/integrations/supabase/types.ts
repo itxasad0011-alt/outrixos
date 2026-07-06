@@ -14,7 +14,445 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_log: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          kind: string
+          lead_id: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind: string
+          lead_id?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          lead_id?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_log_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_memory: {
+        Row: {
+          category: string
+          created_at: string
+          detail: string | null
+          id: string
+          title: string
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title: string
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          ai_summary: string | null
+          created_at: string
+          id: string
+          intent: string | null
+          last_message_at: string | null
+          lead_id: string
+          unread: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          created_at?: string
+          id?: string
+          intent?: string | null
+          last_message_at?: string | null
+          lead_id: string
+          unread?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string | null
+          created_at?: string
+          id?: string
+          intent?: string | null
+          last_message_at?: string | null
+          lead_id?: string
+          unread?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follow_ups: {
+        Row: {
+          body: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          step: number
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          scheduled_at: string
+          sent_at?: string | null
+          status?: string
+          step: number
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          step?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_ups_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_docs: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          kind: string
+          title: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          title: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          title?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          avatar_url: string | null
+          company: string | null
+          created_at: string
+          full_name: string
+          headline: string | null
+          icp_score: number | null
+          id: string
+          industry: string | null
+          last_activity_at: string | null
+          linkedin_url: string | null
+          role: string | null
+          source: string
+          status: string
+          status_reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string
+          full_name: string
+          headline?: string | null
+          icp_score?: number | null
+          id?: string
+          industry?: string | null
+          last_activity_at?: string | null
+          linkedin_url?: string | null
+          role?: string | null
+          source?: string
+          status?: string
+          status_reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string
+          full_name?: string
+          headline?: string | null
+          icp_score?: number | null
+          id?: string
+          industry?: string | null
+          last_activity_at?: string | null
+          linkedin_url?: string | null
+          role?: string | null
+          source?: string
+          status?: string
+          status_reason?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meetings: {
+        Row: {
+          created_at: string
+          duration_min: number | null
+          id: string
+          lead_id: string
+          meeting_url: string | null
+          notes: string | null
+          scheduled_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          lead_id: string
+          meeting_url?: string | null
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          lead_id?: string
+          meeting_url?: string | null
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          author: string
+          body: string
+          conversation_id: string
+          created_at: string
+          direction: string
+          id: string
+          kind: string | null
+          user_id: string
+        }
+        Insert: {
+          author?: string
+          body: string
+          conversation_id: string
+          created_at?: string
+          direction: string
+          id?: string
+          kind?: string | null
+          user_id: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          kind?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          about: string | null
+          created_at: string
+          email: string | null
+          experience_years: number | null
+          full_name: string | null
+          headline: string | null
+          id: string
+          industry: string | null
+          linkedin_connected: boolean
+          linkedin_url: string | null
+          onboarding_complete: boolean
+          services: string[] | null
+          target_audience: string | null
+          updated_at: string
+          value_proposition: string | null
+        }
+        Insert: {
+          about?: string | null
+          created_at?: string
+          email?: string | null
+          experience_years?: number | null
+          full_name?: string | null
+          headline?: string | null
+          id: string
+          industry?: string | null
+          linkedin_connected?: boolean
+          linkedin_url?: string | null
+          onboarding_complete?: boolean
+          services?: string[] | null
+          target_audience?: string | null
+          updated_at?: string
+          value_proposition?: string | null
+        }
+        Update: {
+          about?: string | null
+          created_at?: string
+          email?: string | null
+          experience_years?: number | null
+          full_name?: string | null
+          headline?: string | null
+          id?: string
+          industry?: string | null
+          linkedin_connected?: boolean
+          linkedin_url?: string | null
+          onboarding_complete?: boolean
+          services?: string[] | null
+          target_audience?: string | null
+          updated_at?: string
+          value_proposition?: string | null
+        }
+        Relationships: []
+      }
+      sales_brain: {
+        Row: {
+          conversation_rules: string | null
+          created_at: string
+          custom_instructions: string | null
+          donts: string[] | null
+          dos: string[] | null
+          faqs: Json | null
+          followup_logic: string | null
+          generated_at: string | null
+          icp: Json | null
+          messaging_strategy: string | null
+          portfolio_links: string[] | null
+          reply_strategy: string | null
+          tone: string
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          conversation_rules?: string | null
+          created_at?: string
+          custom_instructions?: string | null
+          donts?: string[] | null
+          dos?: string[] | null
+          faqs?: Json | null
+          followup_logic?: string | null
+          generated_at?: string | null
+          icp?: Json | null
+          messaging_strategy?: string | null
+          portfolio_links?: string[] | null
+          reply_strategy?: string | null
+          tone?: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          conversation_rules?: string | null
+          created_at?: string
+          custom_instructions?: string | null
+          donts?: string[] | null
+          dos?: string[] | null
+          faqs?: Json | null
+          followup_logic?: string | null
+          generated_at?: string | null
+          icp?: Json | null
+          messaging_strategy?: string | null
+          portfolio_links?: string[] | null
+          reply_strategy?: string | null
+          tone?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
