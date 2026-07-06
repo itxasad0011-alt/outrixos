@@ -11,16 +11,23 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppWonRouteImport } from './routes/_app.won'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppOutreachRouteImport } from './routes/_app.outreach'
 import { Route as AppOnboardingRouteImport } from './routes/_app.onboarding'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
+import { Route as AppNotInterestedRouteImport } from './routes/_app.not-interested'
+import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
 import { Route as AppManualLeadsRouteImport } from './routes/_app.manual-leads'
 import { Route as AppKnowledgeRouteImport } from './routes/_app.knowledge'
+import { Route as AppInterestedRouteImport } from './routes/_app.interested'
+import { Route as AppIntegrationsRouteImport } from './routes/_app.integrations'
 import { Route as AppFollowupsRouteImport } from './routes/_app.followups'
 import { Route as AppDiscoveryRouteImport } from './routes/_app.discovery'
 import { Route as AppConversationsRouteImport } from './routes/_app.conversations'
 import { Route as AppBrainRouteImport } from './routes/_app.brain'
+import { Route as AppBillingRouteImport } from './routes/_app.billing'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
 
 const AppRoute = AppRouteImport.update({
@@ -30,6 +37,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWonRoute = AppWonRouteImport.update({
+  id: '/won',
+  path: '/won',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -47,6 +59,21 @@ const AppOnboardingRoute = AppOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotInterestedRoute = AppNotInterestedRouteImport.update({
+  id: '/not-interested',
+  path: '/not-interested',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMemoryRoute = AppMemoryRouteImport.update({
+  id: '/memory',
+  path: '/memory',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMeetingsRoute = AppMeetingsRouteImport.update({
   id: '/meetings',
   path: '/meetings',
@@ -60,6 +87,16 @@ const AppManualLeadsRoute = AppManualLeadsRouteImport.update({
 const AppKnowledgeRoute = AppKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInterestedRoute = AppInterestedRouteImport.update({
+  id: '/interested',
+  path: '/interested',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIntegrationsRoute = AppIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFollowupsRoute = AppFollowupsRouteImport.update({
@@ -82,6 +119,11 @@ const AppBrainRoute = AppBrainRouteImport.update({
   path: '/brain',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBillingRoute = AppBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -91,45 +133,66 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/analytics': typeof AppAnalyticsRoute
+  '/billing': typeof AppBillingRoute
   '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
   '/followups': typeof AppFollowupsRoute
+  '/integrations': typeof AppIntegrationsRoute
+  '/interested': typeof AppInterestedRoute
   '/knowledge': typeof AppKnowledgeRoute
   '/manual-leads': typeof AppManualLeadsRoute
   '/meetings': typeof AppMeetingsRoute
+  '/memory': typeof AppMemoryRoute
+  '/not-interested': typeof AppNotInterestedRoute
+  '/notifications': typeof AppNotificationsRoute
   '/onboarding': typeof AppOnboardingRoute
   '/outreach': typeof AppOutreachRoute
   '/profile': typeof AppProfileRoute
+  '/won': typeof AppWonRoute
 }
 export interface FileRoutesByTo {
   '/analytics': typeof AppAnalyticsRoute
+  '/billing': typeof AppBillingRoute
   '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
   '/followups': typeof AppFollowupsRoute
+  '/integrations': typeof AppIntegrationsRoute
+  '/interested': typeof AppInterestedRoute
   '/knowledge': typeof AppKnowledgeRoute
   '/manual-leads': typeof AppManualLeadsRoute
   '/meetings': typeof AppMeetingsRoute
+  '/memory': typeof AppMemoryRoute
+  '/not-interested': typeof AppNotInterestedRoute
+  '/notifications': typeof AppNotificationsRoute
   '/onboarding': typeof AppOnboardingRoute
   '/outreach': typeof AppOutreachRoute
   '/profile': typeof AppProfileRoute
+  '/won': typeof AppWonRoute
   '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/analytics': typeof AppAnalyticsRoute
+  '/_app/billing': typeof AppBillingRoute
   '/_app/brain': typeof AppBrainRoute
   '/_app/conversations': typeof AppConversationsRoute
   '/_app/discovery': typeof AppDiscoveryRoute
   '/_app/followups': typeof AppFollowupsRoute
+  '/_app/integrations': typeof AppIntegrationsRoute
+  '/_app/interested': typeof AppInterestedRoute
   '/_app/knowledge': typeof AppKnowledgeRoute
   '/_app/manual-leads': typeof AppManualLeadsRoute
   '/_app/meetings': typeof AppMeetingsRoute
+  '/_app/memory': typeof AppMemoryRoute
+  '/_app/not-interested': typeof AppNotInterestedRoute
+  '/_app/notifications': typeof AppNotificationsRoute
   '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/outreach': typeof AppOutreachRoute
   '/_app/profile': typeof AppProfileRoute
+  '/_app/won': typeof AppWonRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -137,44 +200,65 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/analytics'
+    | '/billing'
     | '/brain'
     | '/conversations'
     | '/discovery'
     | '/followups'
+    | '/integrations'
+    | '/interested'
     | '/knowledge'
     | '/manual-leads'
     | '/meetings'
+    | '/memory'
+    | '/not-interested'
+    | '/notifications'
     | '/onboarding'
     | '/outreach'
     | '/profile'
+    | '/won'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/analytics'
+    | '/billing'
     | '/brain'
     | '/conversations'
     | '/discovery'
     | '/followups'
+    | '/integrations'
+    | '/interested'
     | '/knowledge'
     | '/manual-leads'
     | '/meetings'
+    | '/memory'
+    | '/not-interested'
+    | '/notifications'
     | '/onboarding'
     | '/outreach'
     | '/profile'
+    | '/won'
     | '/'
   id:
     | '__root__'
     | '/_app'
     | '/_app/analytics'
+    | '/_app/billing'
     | '/_app/brain'
     | '/_app/conversations'
     | '/_app/discovery'
     | '/_app/followups'
+    | '/_app/integrations'
+    | '/_app/interested'
     | '/_app/knowledge'
     | '/_app/manual-leads'
     | '/_app/meetings'
+    | '/_app/memory'
+    | '/_app/not-interested'
+    | '/_app/notifications'
     | '/_app/onboarding'
     | '/_app/outreach'
     | '/_app/profile'
+    | '/_app/won'
     | '/_app/'
   fileRoutesById: FileRoutesById
 }
@@ -198,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/won': {
+      id: '/_app/won'
+      path: '/won'
+      fullPath: '/won'
+      preLoaderRoute: typeof AppWonRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/profile': {
       id: '/_app/profile'
       path: '/profile'
@@ -219,6 +310,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOnboardingRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/not-interested': {
+      id: '/_app/not-interested'
+      path: '/not-interested'
+      fullPath: '/not-interested'
+      preLoaderRoute: typeof AppNotInterestedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/memory': {
+      id: '/_app/memory'
+      path: '/memory'
+      fullPath: '/memory'
+      preLoaderRoute: typeof AppMemoryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/meetings': {
       id: '/_app/meetings'
       path: '/meetings'
@@ -238,6 +350,20 @@ declare module '@tanstack/react-router' {
       path: '/knowledge'
       fullPath: '/knowledge'
       preLoaderRoute: typeof AppKnowledgeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/interested': {
+      id: '/_app/interested'
+      path: '/interested'
+      fullPath: '/interested'
+      preLoaderRoute: typeof AppInterestedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/integrations': {
+      id: '/_app/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AppIntegrationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/followups': {
@@ -268,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBrainRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/billing': {
+      id: '/_app/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AppBillingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/analytics': {
       id: '/_app/analytics'
       path: '/analytics'
@@ -280,31 +413,45 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppBillingRoute: typeof AppBillingRoute
   AppBrainRoute: typeof AppBrainRoute
   AppConversationsRoute: typeof AppConversationsRoute
   AppDiscoveryRoute: typeof AppDiscoveryRoute
   AppFollowupsRoute: typeof AppFollowupsRoute
+  AppIntegrationsRoute: typeof AppIntegrationsRoute
+  AppInterestedRoute: typeof AppInterestedRoute
   AppKnowledgeRoute: typeof AppKnowledgeRoute
   AppManualLeadsRoute: typeof AppManualLeadsRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
+  AppMemoryRoute: typeof AppMemoryRoute
+  AppNotInterestedRoute: typeof AppNotInterestedRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppOutreachRoute: typeof AppOutreachRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppWonRoute: typeof AppWonRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
+  AppBillingRoute: AppBillingRoute,
   AppBrainRoute: AppBrainRoute,
   AppConversationsRoute: AppConversationsRoute,
   AppDiscoveryRoute: AppDiscoveryRoute,
   AppFollowupsRoute: AppFollowupsRoute,
+  AppIntegrationsRoute: AppIntegrationsRoute,
+  AppInterestedRoute: AppInterestedRoute,
   AppKnowledgeRoute: AppKnowledgeRoute,
   AppManualLeadsRoute: AppManualLeadsRoute,
   AppMeetingsRoute: AppMeetingsRoute,
+  AppMemoryRoute: AppMemoryRoute,
+  AppNotInterestedRoute: AppNotInterestedRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppOutreachRoute: AppOutreachRoute,
   AppProfileRoute: AppProfileRoute,
+  AppWonRoute: AppWonRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
