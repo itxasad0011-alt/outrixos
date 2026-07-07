@@ -92,7 +92,7 @@ export function AppSidebar() {
             <Sparkles className="h-4 w-4" strokeWidth={2} />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-[14px] font-semibold tracking-tight">Relay</span>
+            <span className="text-[14px] font-semibold tracking-tight">Outrix</span>
             <span className="text-[11px] text-muted-foreground">AI Sales Agent</span>
           </div>
         </div>

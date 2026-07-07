@@ -15,7 +15,7 @@ const groups = [
       { t: "New reply received", d: "When a lead replies to any message.", email: true, push: true },
       { t: "Lead marked Interested", d: "AI flags a prospect as high intent.", email: true, push: true },
       { t: "Meeting booked", d: "A discovery call or demo lands on your calendar.", email: true, push: true },
-      { t: "Deal marked Won", d: "You close a client using Relay.", email: true, push: false },
+      { t: "Deal marked Won", d: "You close a client using Outrix.", email: true, push: false },
     ],
   },
   {
