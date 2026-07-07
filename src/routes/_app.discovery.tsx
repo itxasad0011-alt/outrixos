@@ -90,7 +90,8 @@ function DiscoveryPage() {
                   <div className="mt-3 flex items-center gap-2">
                     <Badge variant="secondary" className="rounded-full text-[10.5px] capitalize">{l.status}</Badge>
                     {l.status === "qualified" && (
-                      <Button size="sm" onClick={() => outreachM.mutate(l.id)} disabled={outreachM.isPending}
+                      <Button size="sm"
+                        onClick={() => setComposeLead({ id: l.id, full_name: l.full_name, company: l.company, headline: l.headline })}
                         className="ml-auto h-7 rounded-lg bg-[#0A0A0A] px-2.5 text-[11.5px] hover:bg-[#262626]">
                         <Send className="mr-1 h-3 w-3" /> Send intro
                       </Button>
