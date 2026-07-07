@@ -4,14 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
   MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, Plug, CreditCard, Bell, LogOut,
+  BarChart3, Database, Plug, CreditCard, Bell, LogOut, Settings, Keyboard, LifeBuoy, ChevronsUpDown,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const groups = [
   {
