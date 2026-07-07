@@ -60,21 +60,20 @@ function AppLayout() {
               />
               <kbd className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center rounded-md border border-border/70 bg-white px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground md:inline-flex">⌘K</kbd>
             </div>
-            <div className="ml-auto flex items-center gap-2">
-              <Badge variant="secondary" className="hidden gap-1.5 rounded-full border border-border/60 bg-white px-2.5 py-1 text-[11px] font-medium text-muted-foreground md:inline-flex">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> AI Agent · Live
-              </Badge>
-              <Button variant="ghost" size="icon" className="rounded-xl">
+            <div className="ml-auto flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="rounded-xl" title="Help">
                 <HelpCircle className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-xl">
-                <Bell className="h-4 w-4" />
+              <Button asChild variant="ghost" size="icon" className="rounded-xl" title="Notifications">
+                <Link to="/notifications"><Bell className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="sm" className="h-9 rounded-xl bg-[#0A0A0A] px-3 text-[12.5px] font-medium text-white hover:bg-[#262626]">
-                <Link to="/profile">
-                  <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Setup Agent
-                </Link>
-              </Button>
+              {onboardingComplete === false && (
+                <Button asChild size="sm" className="ml-1 h-9 rounded-xl bg-[#0A0A0A] px-3 text-[12.5px] font-medium text-white hover:bg-[#262626]">
+                  <Link to="/profile">
+                    <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Setup Outrix
+                  </Link>
+                </Button>
+              )}
             </div>
           </header>
           <main className="flex-1">
