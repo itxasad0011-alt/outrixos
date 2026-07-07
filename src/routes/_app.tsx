@@ -15,14 +15,21 @@ export const Route = createFileRoute("/_app")({
 function AppLayout() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) {
         navigate({ to: "/auth", search: { next: window.location.pathname } });
-      } else {
-        setReady(true);
+        return;
       }
+      setReady(true);
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("id", data.session.user.id)
+        .maybeSingle();
+      setOnboardingComplete(!!p?.onboarding_complete);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") navigate({ to: "/auth" });
