@@ -338,37 +338,6 @@ function Dashboard() {
           </Card>
         </div>
 
-        {/* SECTION 5 — Sales Pipeline */}
-        <Card className="rounded-2xl border-border/70">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="text-[14px] font-semibold">Sales pipeline</div>
-              <div className="text-[11.5px] text-muted-foreground">Click a stage to open the filtered list</div>
-            </div>
-            <div className="mt-5 flex items-stretch gap-2 overflow-x-auto pb-1">
-              {stats?.pipeline.map((p, i) => (
-                <Fragment key={p.key}>
-                  <Link
-                    to={stageLink(p.key)}
-                    className="group min-w-[130px] flex-1 rounded-xl border border-border/70 bg-white px-4 py-4 transition hover:border-neutral-300 hover:bg-neutral-50"
-                  >
-                    <div className="text-[10.5px] font-medium uppercase tracking-wider text-muted-foreground">{p.label}</div>
-                    <div className="mt-1.5 text-[24px] font-semibold tabular-nums leading-none">{p.count}</div>
-                    <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-neutral-100">
-                      <div
-                        className="h-full rounded-full bg-neutral-900 transition-all"
-                        style={{ width: `${Math.min(100, (p.count / maxPipeline) * 100)}%` }}
-                      />
-                    </div>
-                  </Link>
-                  {i < (stats?.pipeline.length ?? 0) - 1 && (
-                    <div className="hidden shrink-0 items-center text-muted-foreground xl:flex"><ChevronRight className="h-4 w-4" /></div>
-                  )}
-                </Fragment>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* SECTION 6 & 7 — Upcoming Meetings + AI Insights */}
         <div className="grid gap-4 lg:grid-cols-2">
