@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, Fragment } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -180,7 +180,6 @@ function Dashboard() {
   ] as const;
 
   const insights = buildInsights(stats);
-  const maxPipeline = Math.max(1, ...(stats?.pipeline.map((x) => x.count) ?? [1]));
 
   return (
     <div>
@@ -503,16 +502,6 @@ function greetingFor(d: Date) {
   if (h < 12) return "Good morning";
   if (h < 18) return "Good afternoon";
   return "Good evening";
-}
-function stageLink(key: string): string {
-  switch (key) {
-    case "interested": return "/interested";
-    case "meeting": return "/meetings";
-    case "warm": return "/won";
-    case "won": return "/won";
-    case "conversation": return "/conversations";
-    default: return "/discovery";
-  }
 }
 
 type Stats = {
