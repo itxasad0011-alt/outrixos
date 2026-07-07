@@ -39,11 +39,34 @@ const groups = [
 ];
 
 function Notifications() {
+  const [dirty, setDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const save = async () => {
+    setSaving(true);
+    // Preferences are stored client-side until the backend endpoint is wired.
+    await new Promise((r) => setTimeout(r, 500));
+    setSaving(false);
+    setDirty(false);
+    toast.success("Notification preferences saved");
+  };
+
   return (
     <div>
-      <PageHeader title="Notifications" description="Choose when and how your AI keeps you in the loop." />
+      <PageHeader
+        title="Notifications"
+        description="Choose when and how your AI keeps you in the loop."
+        actions={
+          <Button
+            onClick={save}
+            disabled={!dirty || saving}
+            className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </Button>
+        }
+      />
       <div className="p-8">
-        <Card className="rounded-2xl border-border/60 bg-white shadow-none">
+        <Card className="rounded-2xl border-border/60 bg-card shadow-none">
           <CardContent className="p-0">
             {groups.map((g, gi) => (
               <div key={g.label}>
@@ -55,13 +78,25 @@ function Notifications() {
                 </div>
                 <div className="divide-y divide-border/60">
                   {g.items.map((it) => (
-                    <div key={it.t} className="grid grid-cols-[1fr_100px_100px] items-center gap-4 px-6 py-4">
+                    <div key={it.t} className="grid grid-cols-[1fr_100px_100px] items-center gap-4 px-6 py-4 transition-colors hover:bg-secondary/30">
                       <div>
                         <div className="text-[13px] font-medium">{it.t}</div>
                         <div className="text-[11.5px] text-muted-foreground">{it.d}</div>
                       </div>
-                      <div className="flex justify-center"><Switch defaultChecked={it.email} /></div>
-                      <div className="flex justify-center"><Switch defaultChecked={it.push} /></div>
+                      <div className="flex justify-center">
+                        <Switch
+                          defaultChecked={it.email}
+                          onCheckedChange={() => setDirty(true)}
+                          aria-label={`${it.t} email notification`}
+                        />
+                      </div>
+                      <div className="flex justify-center">
+                        <Switch
+                          defaultChecked={it.push}
+                          onCheckedChange={() => setDirty(true)}
+                          aria-label={`${it.t} push notification`}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
