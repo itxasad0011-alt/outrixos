@@ -131,20 +131,70 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-3 group-data-[collapsible=icon]:p-2">
-        <div className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0">
-          <Avatar className="h-8 w-8 shrink-0">
-            <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
-              {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1 overflow-hidden whitespace-nowrap transition-[opacity,width] duration-200 ease-out group-data-[collapsible=icon]:hidden">
-            <div className="truncate text-[12.5px] font-medium">{user?.full_name ?? "Signed in"}</div>
-            <div className="truncate text-[11px] text-muted-foreground">{user?.email}</div>
-          </div>
-          <Button variant="ghost" size="icon" onClick={signOut} className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground group-data-[collapsible=icon]:hidden" title="Sign out">
-            <LogOut className="h-3.5 w-3.5" />
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="group/acct flex w-full items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5 text-left transition-all hover:bg-neutral-50 hover:shadow-sm active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:hover:bg-transparent"
+            >
+              <Avatar className="h-8 w-8 shrink-0">
+                <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
+                  {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1 overflow-hidden whitespace-nowrap transition-[opacity,width] duration-200 ease-out group-data-[collapsible=icon]:hidden">
+                <div className="truncate text-[12.5px] font-medium">{user?.full_name ?? "Signed in"}</div>
+                <div className="truncate text-[11px] text-muted-foreground">{user?.email}</div>
+              </div>
+              <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/acct:opacity-100 group-data-[collapsible=icon]:hidden" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side="top"
+            align="start"
+            sideOffset={8}
+            className="w-64 rounded-2xl border-border/70 p-1.5 shadow-xl"
+          >
+            <DropdownMenuLabel className="px-2 py-2">
+              <div className="flex items-center gap-2.5">
+                <Avatar className="h-9 w-9">
+                  <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
+                    {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13px] font-semibold">{user?.full_name ?? "Signed in"}</div>
+                  <div className="truncate text-[11.5px] font-normal text-muted-foreground">{user?.email}</div>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="rounded-lg text-[13px]">
+              <Link to="/profile"><User className="mr-2 h-4 w-4" /> My Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="rounded-lg text-[13px]">
+              <Link to="/integrations"><Settings className="mr-2 h-4 w-4" /> Workspace Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="rounded-lg text-[13px]">
+              <Link to="/billing"><CreditCard className="mr-2 h-4 w-4" /> Subscription & Billing</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="rounded-lg text-[13px]">
+              <Link to="/notifications"><Bell className="mr-2 h-4 w-4" /> Notifications</Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="rounded-lg text-[13px]" onSelect={(e) => e.preventDefault()}>
+              <Keyboard className="mr-2 h-4 w-4" /> Keyboard Shortcuts
+              <span className="ml-auto text-[10.5px] text-muted-foreground">⌘/</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="rounded-lg text-[13px]" onSelect={() => window.open("mailto:support@outrix.ai", "_blank")}>
+              <LifeBuoy className="mr-2 h-4 w-4" /> Help & Support
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={signOut} className="rounded-lg text-[13px] text-destructive focus:text-destructive">
+              <LogOut className="mr-2 h-4 w-4" /> Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );
