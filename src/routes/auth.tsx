@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -23,6 +23,20 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+function friendlyError(raw: string): string {
+  const m = raw.toLowerCase();
+  if (m.includes("invalid login") || m.includes("invalid credentials")) return "Incorrect email or password.";
+  if (m.includes("email not confirmed")) return "Please confirm your email before signing in.";
+  if (m.includes("user already registered") || m.includes("already been registered")) return "An account with this email already exists. Try signing in.";
+  if (m.includes("password") && m.includes("6")) return "Password must be at least 6 characters.";
+  if (m.includes("weak") && m.includes("password")) return "Please choose a stronger password.";
+  if (m.includes("invalid email") || m.includes("unable to validate email")) return "Please enter a valid email address.";
+  if (m.includes("user not found")) return "No account found with this email.";
+  if (m.includes("rate limit") || m.includes("too many")) return "Too many attempts. Please wait a moment and try again.";
+  if (m.includes("network") || m.includes("fetch")) return "Network error. Check your connection and try again.";
+  return "Something went wrong. Please try again.";
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const { next } = useSearch({ from: "/auth" });
@@ -31,34 +45,73 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
       if (data.session) navigate({ to: next ?? "/" });
+      else setChecking(false);
     });
+    return () => { mounted = false; };
   }, [navigate, next]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (loading) return;
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) return toast.error("Please enter your email.");
+    if (password.length < 6) return toast.error("Password must be at least 6 characters.");
+    if (mode === "signup" && !fullName.trim()) return toast.error("Please enter your full name.");
+
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin },
+        const { data, error } = await supabase.auth.signUp({
+          email: trimmedEmail,
+          password,
+          options: {
+            data: { full_name: fullName.trim() },
+            emailRedirectTo: `${window.location.origin}/`,
+          },
         });
         if (error) throw error;
-        toast.success("Account created");
+        // Supabase returns an empty identities array when the email already exists.
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          toast.error("An account with this email already exists. Try signing in.");
+          setMode("signin");
+          return;
+        }
+        if (!data.session) {
+          toast.success("Check your inbox to confirm your email.");
+          setMode("signin");
+          return;
+        }
+        toast.success("Welcome to Outrix!");
+        navigate({ to: next ?? "/" });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
+          password,
+        });
         if (error) throw error;
+        navigate({ to: next ?? "/" });
       }
-      navigate({ to: next ?? "/" });
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(friendlyError(msg));
     } finally {
       setLoading(false);
     }
+  }
+
+  if (checking) {
+    return (
+      <div className="grid min-h-screen w-full place-items-center bg-[oklch(0.985_0.003_260)]">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
@@ -83,29 +136,63 @@ function AuthPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={onSubmit} className="space-y-3">
+            <form onSubmit={onSubmit} className="space-y-3" noValidate>
               {mode === "signup" && (
                 <div className="space-y-1.5">
                   <Label className="text-[12px]">Full name</Label>
-                  <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-9 rounded-lg" />
+                  <Input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    autoComplete="name"
+                    disabled={loading}
+                    required
+                    className="h-9 rounded-lg"
+                  />
                 </div>
               )}
               <div className="space-y-1.5">
                 <Label className="text-[12px]">Email</Label>
-                <Input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-9 rounded-lg" />
+                <Input
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  required
+                  className="h-9 rounded-lg"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[12px]">Password</Label>
-                <Input type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-9 rounded-lg" />
+                <Input
+                  type="password"
+                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  required
+                  minLength={6}
+                  className="h-9 rounded-lg"
+                />
               </div>
-              <Button type="submit" disabled={loading} className="h-9 w-full rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
-                {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
+              <Button
+                type="submit"
+                disabled={loading}
+                className="h-9 w-full rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
+              >
+                {loading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    {mode === "signin" ? "Signing in…" : "Creating account…"}
+                  </span>
+                ) : mode === "signin" ? "Sign in" : "Create account"}
               </Button>
             </form>
             <button
               type="button"
+              disabled={loading}
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="mt-4 w-full text-[12px] text-muted-foreground hover:text-foreground"
+              className="mt-4 w-full text-[12px] text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
             </button>
