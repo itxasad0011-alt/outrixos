@@ -707,8 +707,10 @@ function stageLink(key: string): string {
 type Stats = {
   total: number; sent: number; replied: number; interested: number; meetings: number;
   replyRate: number; conversion: number;
+  weekly: { day: string; connections: number; replies: number; meetings: number }[];
   yesterday: { leads: number; conversations: number; meetings: number; highIntent: number };
 } | undefined;
+
 
 function buildSummary(stats: Stats, name: string) {
   if (!stats) return `Loading your day, ${name}…`;
