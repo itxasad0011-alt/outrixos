@@ -25,16 +25,22 @@ export const Route = createFileRoute("/auth")({
 
 function friendlyError(raw: string): string {
   const m = raw.toLowerCase();
-  if (m.includes("invalid login") || m.includes("invalid credentials")) return "Incorrect email or password.";
-  if (m.includes("email not confirmed")) return "Please confirm your email before signing in.";
-  if (m.includes("user already registered") || m.includes("already been registered")) return "An account with this email already exists. Try signing in.";
+  if (m.includes("invalid login") || m.includes("invalid credentials")) return "Invalid login credentials.";
+  if (m.includes("email not confirmed")) return "Please verify your email before signing in.";
+  if (m.includes("user already registered") || m.includes("already been registered")) return "User already registered. Try signing in.";
   if (m.includes("password") && m.includes("6")) return "Password must be at least 6 characters.";
   if (m.includes("weak") && m.includes("password")) return "Please choose a stronger password.";
   if (m.includes("invalid email") || m.includes("unable to validate email")) return "Please enter a valid email address.";
-  if (m.includes("user not found")) return "No account found with this email.";
+  if (m.includes("user not found")) return "User not found.";
   if (m.includes("rate limit") || m.includes("too many")) return "Too many attempts. Please wait a moment and try again.";
   if (m.includes("network") || m.includes("fetch")) return "Network error. Check your connection and try again.";
-  return "Something went wrong. Please try again.";
+  return raw || "Something went wrong. Please try again.";
+}
+
+function authTimeout(): Promise<never> {
+  return new Promise((_, reject) => {
+    window.setTimeout(() => reject(new Error("Network error: authentication request timed out.")), 20000);
+  });
 }
 
 function AuthPage() {
@@ -49,12 +55,23 @@ function AuthPage() {
 
   useEffect(() => {
     let mounted = true;
+    console.debug("[Auth] Session check started");
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
+      console.debug("[Auth] Session check completed", { hasSession: Boolean(data.session) });
       if (data.session) navigate({ to: next ?? "/" });
       else setChecking(false);
+    }).catch((error) => {
+      console.error("[Auth] Session check failed", error);
+      if (mounted) setChecking(false);
     });
-    return () => { mounted = false; };
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.debug("[Auth] onAuthStateChange fired", { event, hasSession: Boolean(session) });
+    });
+    return () => {
+      mounted = false;
+      authListener.subscription.unsubscribe();
+    };
   }, [navigate, next]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -68,14 +85,20 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
-          email: trimmedEmail,
-          password,
-          options: {
-            data: { full_name: fullName.trim() },
-            emailRedirectTo: `${window.location.origin}/`,
-          },
-        });
+        console.debug("[Auth] Signup started", { email: trimmedEmail });
+        console.debug("[Auth] Signup request sent");
+        const { data, error } = await Promise.race([
+          supabase.auth.signUp({
+            email: trimmedEmail,
+            password,
+            options: {
+              data: { full_name: fullName.trim() },
+              emailRedirectTo: `${window.location.origin}/`,
+            },
+          }),
+          authTimeout(),
+        ]);
+        console.debug("[Auth] Signup response received", { hasUser: Boolean(data.user), hasSession: Boolean(data.session), error: error?.message ?? null });
         if (error) throw error;
         // Supabase returns an empty identities array when the email already exists.
         if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -89,17 +112,36 @@ function AuthPage() {
           return;
         }
         toast.success("Welcome to Outrix!");
-        navigate({ to: next ?? "/" });
+        console.debug("[Auth] Session created", { userId: data.session.user.id });
+        console.debug("[Auth] Redirect started", { to: next ?? "/" });
+        setLoading(false);
+        await navigate({ to: next ?? "/" });
+        console.debug("[Auth] Redirect completed");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: trimmedEmail,
-          password,
-        });
+        console.debug("[Auth] Login started", { email: trimmedEmail });
+        console.debug("[Auth] Request sent", { endpoint: "/auth/v1/token", method: "POST" });
+        const { data, error } = await Promise.race([
+          supabase.auth.signInWithPassword({
+            email: trimmedEmail,
+            password,
+          }),
+          authTimeout(),
+        ]);
+        console.debug("[Auth] Response received", { hasUser: Boolean(data.user), hasSession: Boolean(data.session), error: error?.message ?? null });
         if (error) throw error;
-        navigate({ to: next ?? "/" });
+        if (!data.session) throw new Error("Please verify your email before signing in.");
+        const { data: storedSession, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!storedSession.session) throw new Error("Session was created but could not be saved. Please try again.");
+        console.debug("[Auth] Session created", { userId: data.session.user.id, saved: true });
+        console.debug("[Auth] Redirect started", { to: next ?? "/" });
+        setLoading(false);
+        await navigate({ to: next ?? "/" });
+        console.debug("[Auth] Redirect completed");
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
+      console.error("[Auth] Error received", { message: msg, error: err });
       toast.error(friendlyError(msg));
     } finally {
       setLoading(false);
