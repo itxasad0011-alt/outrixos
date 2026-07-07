@@ -32,18 +32,14 @@ function DiscoveryPage() {
   });
 
   const discover = useServerFn(discoverLeads);
-  const outreach = useServerFn(runOutreach);
 
   const discoverM = useMutation({
     mutationFn: () => discover({ data: { count: 8 } }),
     onSuccess: (r) => { toast.success(`Discovered ${r.count} leads`); qc.invalidateQueries({ queryKey: ["leads"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-  const outreachM = useMutation({
-    mutationFn: (id: string) => outreach({ data: { lead_id: id } }),
-    onSuccess: () => { toast.success("Intro sent"); qc.invalidateQueries({ queryKey: ["leads"] }); qc.invalidateQueries({ queryKey: ["conversations"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
+
+  const [composeLead, setComposeLead] = useState<LeadRow | null>(null);
 
   return (
     <div>
