@@ -88,10 +88,13 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/60 overflow-hidden transition-[width] duration-300 ease-out">
-      <SidebarHeader className="px-3 pt-4 pb-2">
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-border/60 overflow-hidden transition-[width] duration-[250ms] ease-out group-data-[state=collapsed]:border-transparent group-data-[state=collapsed]:[&_[data-sidebar=sidebar]]:bg-[#111111] group-data-[state=collapsed]:[&_[data-sidebar=sidebar]]:text-white"
+    >
+      <SidebarHeader className="px-3 pt-4 pb-2 group-data-[state=collapsed]:pt-5">
         <div className="flex items-center gap-2.5 px-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-700 text-white shadow-sm">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-white to-neutral-200 text-neutral-900 shadow-sm group-data-[state=expanded]:from-neutral-900 group-data-[state=expanded]:to-neutral-700 group-data-[state=expanded]:text-white transition-colors duration-[250ms]">
             <Sparkles className="h-4 w-4" strokeWidth={2} />
           </div>
           <div className="flex min-w-0 flex-col leading-tight overflow-hidden whitespace-nowrap transition-[opacity,width,margin] duration-200 ease-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0">
@@ -101,24 +104,24 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0 overflow-x-hidden">
+      <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0 group-data-[state=collapsed]:pt-2 overflow-x-hidden">
         {groups.map((g) => (
-          <SidebarGroup key={g.label}>
+          <SidebarGroup key={g.label} className="group-data-[state=collapsed]:py-1">
             <SidebarGroupLabel className="px-3 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/60 overflow-hidden whitespace-nowrap transition-[opacity,height,margin,padding] duration-200 ease-out group-data-[collapsible=icon]:h-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:my-0 group-data-[collapsible=icon]:py-0">
               {g.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="group-data-[state=collapsed]:gap-1.5 group-data-[state=collapsed]:items-center">
                 {g.items.map((item) => (
-                  <SidebarMenuItem key={item.url}>
+                  <SidebarMenuItem key={item.url} className="group-data-[state=collapsed]:w-auto">
                     <SidebarMenuButton
                       asChild
                       isActive={isActive(item.url)}
                       tooltip={item.title}
-                      className="h-8.5 rounded-xl data-[active=true]:bg-white data-[active=true]:shadow-sm data-[active=true]:text-foreground group-data-[collapsible=icon]:justify-center"
+                      className="h-8.5 rounded-xl data-[active=true]:bg-white data-[active=true]:shadow-sm data-[active=true]:text-foreground group-data-[collapsible=icon]:justify-center group-data-[state=collapsed]:h-10 group-data-[state=collapsed]:w-10 group-data-[state=collapsed]:rounded-2xl group-data-[state=collapsed]:!p-0 group-data-[state=collapsed]:text-white/70 group-data-[state=collapsed]:hover:text-white group-data-[state=collapsed]:hover:bg-white/[0.06] group-data-[state=collapsed]:data-[active=true]:bg-white/[0.12] group-data-[state=collapsed]:data-[active=true]:text-white group-data-[state=collapsed]:data-[active=true]:shadow-none transition-colors duration-200"
                     >
                       <Link to={item.url} className="flex items-center gap-2.5">
-                        <item.icon className="h-[16px] w-[16px] shrink-0" strokeWidth={1.75} />
+                        <item.icon className="h-[17px] w-[17px] shrink-0" strokeWidth={1.75} />
                         <span className="text-[13px] font-medium truncate transition-opacity duration-200 group-data-[collapsible=icon]:hidden">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -130,6 +133,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
 
+
       <SidebarFooter className="p-3 group-data-[collapsible=icon]:p-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -137,8 +141,8 @@ export function AppSidebar() {
               type="button"
               className="group/acct flex w-full items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5 text-left transition-all hover:bg-neutral-50 hover:shadow-sm active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:hover:bg-transparent"
             >
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
+              <Avatar className="h-8 w-8 shrink-0 ring-0 group-data-[collapsible=icon]:ring-2 group-data-[collapsible=icon]:ring-white/10 transition-all">
+                <AvatarFallback className="bg-neutral-900 text-[11px] text-white group-data-[collapsible=icon]:bg-white group-data-[collapsible=icon]:text-neutral-900">
                   {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
                 </AvatarFallback>
               </Avatar>
