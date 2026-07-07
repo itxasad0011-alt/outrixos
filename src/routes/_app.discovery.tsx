@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { discoverLeads, runOutreach } from "@/lib/ai/agent.functions";
+import { discoverLeads } from "@/lib/ai/agent.functions";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { ComposeDialog } from "@/components/compose-dialog";
 
 export const Route = createFileRoute("/_app/discovery")({ component: DiscoveryPage });
+
+type LeadRow = { id: string; full_name: string; company: string | null; headline: string | null };
 
 function DiscoveryPage() {
   const qc = useQueryClient();
