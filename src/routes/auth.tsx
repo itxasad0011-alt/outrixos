@@ -16,8 +16,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => search.parse(s),
   head: () => ({
     meta: [
-      { title: "Sign in — Relay" },
-      { name: "description", content: "Sign in to Relay, your AI LinkedIn sales agent." },
+      { title: "Sign in — Outrix" },
+      { name: "description", content: "Sign in to Outrix, your AI LinkedIn sales agent." },
     ],
   }),
   component: AuthPage,
@@ -69,7 +69,7 @@ function AuthPage() {
             <Sparkles className="h-4 w-4" />
           </div>
           <div className="leading-tight">
-            <div className="text-[15px] font-semibold tracking-tight">Relay</div>
+            <div className="text-[15px] font-semibold tracking-tight">Outrix</div>
             <div className="text-[11px] text-muted-foreground">AI Sales Agent</div>
           </div>
         </div>
