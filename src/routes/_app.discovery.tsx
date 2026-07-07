@@ -103,6 +103,12 @@ function DiscoveryPage() {
           </div>
         )}
       </div>
+      <ComposeDialog
+        open={composeLead !== null}
+        onOpenChange={(o) => { if (!o) setComposeLead(null); }}
+        lead={composeLead}
+        mode="connection"
+      />
     </div>
   );
 }
