@@ -141,8 +141,8 @@ export function AppSidebar() {
               type="button"
               className="group/acct flex w-full items-center gap-2.5 rounded-2xl border border-border/70 bg-white p-2.5 text-left transition-all hover:bg-neutral-50 hover:shadow-sm active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:hover:bg-transparent"
             >
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarFallback className="bg-neutral-900 text-[11px] text-white">
+              <Avatar className="h-8 w-8 shrink-0 ring-0 group-data-[collapsible=icon]:ring-2 group-data-[collapsible=icon]:ring-white/10 transition-all">
+                <AvatarFallback className="bg-neutral-900 text-[11px] text-white group-data-[collapsible=icon]:bg-white group-data-[collapsible=icon]:text-neutral-900">
                   {(user?.full_name ?? user?.email ?? "?").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
                 </AvatarFallback>
               </Avatar>
