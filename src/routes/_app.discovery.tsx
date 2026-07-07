@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { discoverLeads, runOutreach } from "@/lib/ai/agent.functions";
+import { discoverLeads } from "@/lib/ai/agent.functions";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { ComposeDialog } from "@/components/compose-dialog";
 
 export const Route = createFileRoute("/_app/discovery")({ component: DiscoveryPage });
+
+type LeadRow = { id: string; full_name: string; company: string | null; headline: string | null };
 
 function DiscoveryPage() {
   const qc = useQueryClient();
@@ -28,18 +32,14 @@ function DiscoveryPage() {
   });
 
   const discover = useServerFn(discoverLeads);
-  const outreach = useServerFn(runOutreach);
 
   const discoverM = useMutation({
     mutationFn: () => discover({ data: { count: 8 } }),
     onSuccess: (r) => { toast.success(`Discovered ${r.count} leads`); qc.invalidateQueries({ queryKey: ["leads"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-  const outreachM = useMutation({
-    mutationFn: (id: string) => outreach({ data: { lead_id: id } }),
-    onSuccess: () => { toast.success("Intro sent"); qc.invalidateQueries({ queryKey: ["leads"] }); qc.invalidateQueries({ queryKey: ["conversations"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
+
+  const [composeLead, setComposeLead] = useState<LeadRow | null>(null);
 
   return (
     <div>
@@ -90,7 +90,8 @@ function DiscoveryPage() {
                   <div className="mt-3 flex items-center gap-2">
                     <Badge variant="secondary" className="rounded-full text-[10.5px] capitalize">{l.status}</Badge>
                     {l.status === "qualified" && (
-                      <Button size="sm" onClick={() => outreachM.mutate(l.id)} disabled={outreachM.isPending}
+                      <Button size="sm"
+                        onClick={() => setComposeLead({ id: l.id, full_name: l.full_name, company: l.company, headline: l.headline })}
                         className="ml-auto h-7 rounded-lg bg-[#0A0A0A] px-2.5 text-[11.5px] hover:bg-[#262626]">
                         <Send className="mr-1 h-3 w-3" /> Send intro
                       </Button>
@@ -102,6 +103,12 @@ function DiscoveryPage() {
           </div>
         )}
       </div>
+      <ComposeDialog
+        open={composeLead !== null}
+        onOpenChange={(o) => { if (!o) setComposeLead(null); }}
+        lead={composeLead}
+        mode="connection"
+      />
     </div>
   );
 }
