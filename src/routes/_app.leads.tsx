@@ -229,7 +229,7 @@ function LeadsPage() {
 
           <FilterPopover
             filters={filters}
-            setFilters={(f) => { setFilters(f); setPage(1); }}
+            setFilters={(f: any) => { setFilters(f); setPage(1); }}
             facets={facetQ.data}
             activeCount={activeFilterCount}
           />
