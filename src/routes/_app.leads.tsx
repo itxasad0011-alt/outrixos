@@ -376,16 +376,16 @@ function FilterPopover({ filters, setFilters, facets, activeCount }: any) {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[420px] rounded-2xl p-0">
         <div className="max-h-[70vh] overflow-y-auto p-4">
-          <FilterGroup title="Lead source" options={SOURCES.map((s) => ({ v: s.v, l: s.label }))} value={filters.sources} onToggle={(v) => toggle("sources", v)} />
-          <FilterGroup title="Status" options={STATUSES.map((s) => ({ v: s, l: s.replace("_", " ") }))} value={filters.statuses} onToggle={(v) => toggle("statuses", v)} />
+          <FilterGroup title="Lead source" options={SOURCES.map((s) => ({ v: s.v, l: s.label }))} value={filters.sources} onToggle={(v: string) => toggle("sources", v)} />
+          <FilterGroup title="Status" options={STATUSES.map((s) => ({ v: s, l: s.replace("_", " ") }))} value={filters.statuses} onToggle={(v: string) => toggle("statuses", v)} />
           {facets?.industries?.length > 0 && (
-            <FilterGroup title="Industry" options={facets.industries.map((v: string) => ({ v, l: v }))} value={filters.industries} onToggle={(v) => toggle("industries", v)} />
+            <FilterGroup title="Industry" options={facets.industries.map((v: string) => ({ v, l: v }))} value={filters.industries} onToggle={(v: string) => toggle("industries", v)} />
           )}
           {facets?.countries?.length > 0 && (
-            <FilterGroup title="Country" options={facets.countries.map((v: string) => ({ v, l: v }))} value={filters.countries} onToggle={(v) => toggle("countries", v)} />
+            <FilterGroup title="Country" options={facets.countries.map((v: string) => ({ v, l: v }))} value={filters.countries} onToggle={(v: string) => toggle("countries", v)} />
           )}
           {facets?.tags?.length > 0 && (
-            <FilterGroup title="Tags" options={facets.tags.map((v: string) => ({ v, l: v }))} value={filters.tags} onToggle={(v) => toggle("tags", v)} />
+            <FilterGroup title="Tags" options={facets.tags.map((v: string) => ({ v, l: v }))} value={filters.tags} onToggle={(v: string) => toggle("tags", v)} />
           )}
           <div className="mb-2">
             <div className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Minimum ICP score</div>
