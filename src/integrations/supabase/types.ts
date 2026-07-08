@@ -601,52 +601,67 @@ export type Database = {
       profiles: {
         Row: {
           about: string | null
+          country: string | null
           created_at: string
           email: string | null
           experience_years: number | null
           full_name: string | null
+          gender: string | null
           headline: string | null
           id: string
           industry: string | null
+          language: string | null
           linkedin_connected: boolean
           linkedin_url: string | null
           onboarding_complete: boolean
           services: string[] | null
+          skills: string[] | null
           target_audience: string | null
+          timezone: string | null
           updated_at: string
           value_proposition: string | null
         }
         Insert: {
           about?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           experience_years?: number | null
           full_name?: string | null
+          gender?: string | null
           headline?: string | null
           id: string
           industry?: string | null
+          language?: string | null
           linkedin_connected?: boolean
           linkedin_url?: string | null
           onboarding_complete?: boolean
           services?: string[] | null
+          skills?: string[] | null
           target_audience?: string | null
+          timezone?: string | null
           updated_at?: string
           value_proposition?: string | null
         }
         Update: {
           about?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           experience_years?: number | null
           full_name?: string | null
+          gender?: string | null
           headline?: string | null
           id?: string
           industry?: string | null
+          language?: string | null
           linkedin_connected?: boolean
           linkedin_url?: string | null
           onboarding_complete?: boolean
           services?: string[] | null
+          skills?: string[] | null
           target_audience?: string | null
+          timezone?: string | null
           updated_at?: string
           value_proposition?: string | null
         }
@@ -654,54 +669,81 @@ export type Database = {
       }
       sales_brain: {
         Row: {
+          communication_style: string | null
+          company_summary: string | null
           conversation_rules: string | null
           created_at: string
           custom_instructions: string | null
           donts: string[] | null
           dos: string[] | null
+          expertise: string[] | null
           faqs: Json | null
           followup_logic: string | null
           generated_at: string | null
           icp: Json | null
           messaging_strategy: string | null
+          niche: string | null
+          offers: string[] | null
+          outreach_tone: string | null
+          personal_brand_summary: string | null
           portfolio_links: string[] | null
+          positioning: string | null
           reply_strategy: string | null
+          skills: string[] | null
           tone: string
           updated_at: string
           user_id: string
           website: string | null
         }
         Insert: {
+          communication_style?: string | null
+          company_summary?: string | null
           conversation_rules?: string | null
           created_at?: string
           custom_instructions?: string | null
           donts?: string[] | null
           dos?: string[] | null
+          expertise?: string[] | null
           faqs?: Json | null
           followup_logic?: string | null
           generated_at?: string | null
           icp?: Json | null
           messaging_strategy?: string | null
+          niche?: string | null
+          offers?: string[] | null
+          outreach_tone?: string | null
+          personal_brand_summary?: string | null
           portfolio_links?: string[] | null
+          positioning?: string | null
           reply_strategy?: string | null
+          skills?: string[] | null
           tone?: string
           updated_at?: string
           user_id: string
           website?: string | null
         }
         Update: {
+          communication_style?: string | null
+          company_summary?: string | null
           conversation_rules?: string | null
           created_at?: string
           custom_instructions?: string | null
           donts?: string[] | null
           dos?: string[] | null
+          expertise?: string[] | null
           faqs?: Json | null
           followup_logic?: string | null
           generated_at?: string | null
           icp?: Json | null
           messaging_strategy?: string | null
+          niche?: string | null
+          offers?: string[] | null
+          outreach_tone?: string | null
+          personal_brand_summary?: string | null
           portfolio_links?: string[] | null
+          positioning?: string | null
           reply_strategy?: string | null
+          skills?: string[] | null
           tone?: string
           updated_at?: string
           user_id?: string
