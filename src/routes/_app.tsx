@@ -61,11 +61,11 @@ function AppLayout() {
               <kbd className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center rounded-md border border-border/70 bg-white px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground md:inline-flex">⌘K</kbd>
             </div>
             <div className="ml-auto flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="rounded-xl" title="Help">
+              <Button variant="ghost" size="icon" className="rounded-xl" title="Help" aria-label="Help">
                 <HelpCircle className="h-4 w-4" />
               </Button>
               <Button asChild variant="ghost" size="icon" className="rounded-xl" title="Notifications">
-                <Link to="/notifications"><Bell className="h-4 w-4" /></Link>
+                <Link to="/notifications" aria-label="Notifications"><Bell className="h-4 w-4" /></Link>
               </Button>
               {onboardingComplete === false && (
                 <Button asChild size="sm" className="ml-1 h-9 rounded-xl bg-[#0A0A0A] px-3 text-[12.5px] font-medium text-white hover:bg-[#262626]">

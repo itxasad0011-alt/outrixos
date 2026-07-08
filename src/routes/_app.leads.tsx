@@ -252,11 +252,15 @@ function LeadsPage() {
               onClick={() => setView("card")}
               className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === "card" ? "bg-neutral-900 text-white" : "text-muted-foreground hover:text-foreground"}`}
               title="Card view"
+              aria-label="Switch to card view"
+              aria-pressed={view === "card"}
             ><LayoutGrid className="h-3.5 w-3.5" /></button>
             <button
               onClick={() => setView("table")}
               className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === "table" ? "bg-neutral-900 text-white" : "text-muted-foreground hover:text-foreground"}`}
               title="Table view"
+              aria-label="Switch to table view"
+              aria-pressed={view === "table"}
             ><Rows3 className="h-3.5 w-3.5" /></button>
           </div>
         </div>
