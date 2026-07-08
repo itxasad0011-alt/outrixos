@@ -13,7 +13,17 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export const Route = createFileRoute("/_app/")({ component: Dashboard });
+export const Route = createFileRoute("/_app/")({
+  head: () => ({
+    meta: [
+      { title: "Dashboard — Outrix" },
+      { name: "description", content: "Your Outrix control center: pipeline health, today's meetings, active campaigns, and unread conversations at a glance." },
+      { property: "og:title", content: "Dashboard — Outrix" },
+      { property: "og:description", content: "Pipeline health, today's meetings, active campaigns, and unread conversations at a glance." },
+    ],
+  }),
+  component: Dashboard,
+});
 
 const PIPELINE: { key: string; label: string; statuses: string[] }[] = [
   { key: "discovery", label: "Discovery", statuses: ["new"] },
