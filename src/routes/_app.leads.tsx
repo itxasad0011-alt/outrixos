@@ -35,7 +35,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/leads")({ component: LeadsPage });
+export const Route = createFileRoute("/_app/leads")({
+  head: () => ({
+    meta: [
+      { title: "Leads — Outrix" },
+      { name: "description", content: "Search, filter, tag, and enrich every lead in one workspace — discovered by AI, imported from CSV, or added manually." },
+      { property: "og:title", content: "Leads — Outrix" },
+      { property: "og:description", content: "The unified lead management hub for AI discovery, CSV imports, and manual entries." },
+    ],
+  }),
+  component: LeadsPage,
+});
 
 const STATUSES = ["new", "qualified", "contacted", "connected", "conversation", "interested", "meeting", "warm", "won", "not_interested", "archived"];
 const SOURCES = [
