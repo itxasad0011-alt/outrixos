@@ -70,7 +70,7 @@ function Onboarding() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild className="h-9 rounded-xl border-border/70 text-[12.5px]"><Link to="/">Skip for now</Link></Button>
-          <Button asChild className="h-9 rounded-xl bg-[#0A0A0A] text-[12.5px] hover:bg-[#262626]"><Link to="/brain">Continue <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link></Button>
+          <Button asChild className="h-9 rounded-xl bg-[#0A0A0A] text-[12.5px] hover:bg-[#262626]"><Link to="/profile" search={{ tab: "brain" }}>Continue <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link></Button>
         </div>
       </div>
     </div>
