@@ -33,7 +33,6 @@ const groups = [
     label: "System",
     items: [
       { t: "LinkedIn connection health", d: "Warn me if the connection weakens or breaks.", email: true, push: true },
-      { t: "Billing & plan updates", d: "Renewals, failed payments, plan changes.", email: true, push: false },
     ],
   },
 ];
