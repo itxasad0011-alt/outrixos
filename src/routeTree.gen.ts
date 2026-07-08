@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
-import { Route as AppWonRouteImport } from './routes/_app.won'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppOutreachRouteImport } from './routes/_app.outreach'
 import { Route as AppOnboardingRouteImport } from './routes/_app.onboarding'
@@ -29,7 +28,6 @@ import { Route as AppFollowupsRouteImport } from './routes/_app.followups'
 import { Route as AppDiscoveryRouteImport } from './routes/_app.discovery'
 import { Route as AppConversationsRouteImport } from './routes/_app.conversations'
 import { Route as AppBrainRouteImport } from './routes/_app.brain'
-import { Route as AppBillingRouteImport } from './routes/_app.billing'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
 import { Route as AppOutreachCampaignIdRouteImport } from './routes/_app.outreach.$campaignId'
 import { Route as ApiPublicWebhooksN8nEventsRouteImport } from './routes/api/public/webhooks/n8n-events'
@@ -47,11 +45,6 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppWonRoute = AppWonRouteImport.update({
-  id: '/won',
-  path: '/won',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -134,11 +127,6 @@ const AppBrainRoute = AppBrainRouteImport.update({
   path: '/brain',
   getParentRoute: () => AppRoute,
 } as any)
-const AppBillingRoute = AppBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -166,7 +154,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth': typeof AuthRoute
   '/analytics': typeof AppAnalyticsRoute
-  '/billing': typeof AppBillingRoute
   '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
@@ -183,7 +170,6 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AppOnboardingRoute
   '/outreach': typeof AppOutreachRouteWithChildren
   '/profile': typeof AppProfileRoute
-  '/won': typeof AppWonRoute
   '/outreach/$campaignId': typeof AppOutreachCampaignIdRoute
   '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
   '/api/public/webhooks/n8n-events': typeof ApiPublicWebhooksN8nEventsRoute
@@ -191,7 +177,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/analytics': typeof AppAnalyticsRoute
-  '/billing': typeof AppBillingRoute
   '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
@@ -208,7 +193,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AppOnboardingRoute
   '/outreach': typeof AppOutreachRouteWithChildren
   '/profile': typeof AppProfileRoute
-  '/won': typeof AppWonRoute
   '/': typeof AppIndexRoute
   '/outreach/$campaignId': typeof AppOutreachCampaignIdRoute
   '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
@@ -219,7 +203,6 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/analytics': typeof AppAnalyticsRoute
-  '/_app/billing': typeof AppBillingRoute
   '/_app/brain': typeof AppBrainRoute
   '/_app/conversations': typeof AppConversationsRoute
   '/_app/discovery': typeof AppDiscoveryRoute
@@ -236,7 +219,6 @@ export interface FileRoutesById {
   '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/outreach': typeof AppOutreachRouteWithChildren
   '/_app/profile': typeof AppProfileRoute
-  '/_app/won': typeof AppWonRoute
   '/_app/': typeof AppIndexRoute
   '/_app/outreach/$campaignId': typeof AppOutreachCampaignIdRoute
   '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
@@ -248,7 +230,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/analytics'
-    | '/billing'
     | '/brain'
     | '/conversations'
     | '/discovery'
@@ -265,7 +246,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/outreach'
     | '/profile'
-    | '/won'
     | '/outreach/$campaignId'
     | '/api/public/webhooks/linkedin'
     | '/api/public/webhooks/n8n-events'
@@ -273,7 +253,6 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/analytics'
-    | '/billing'
     | '/brain'
     | '/conversations'
     | '/discovery'
@@ -290,7 +269,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/outreach'
     | '/profile'
-    | '/won'
     | '/'
     | '/outreach/$campaignId'
     | '/api/public/webhooks/linkedin'
@@ -300,7 +278,6 @@ export interface FileRouteTypes {
     | '/_app'
     | '/auth'
     | '/_app/analytics'
-    | '/_app/billing'
     | '/_app/brain'
     | '/_app/conversations'
     | '/_app/discovery'
@@ -317,7 +294,6 @@ export interface FileRouteTypes {
     | '/_app/onboarding'
     | '/_app/outreach'
     | '/_app/profile'
-    | '/_app/won'
     | '/_app/'
     | '/_app/outreach/$campaignId'
     | '/api/public/webhooks/linkedin'
@@ -352,13 +328,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/won': {
-      id: '/_app/won'
-      path: '/won'
-      fullPath: '/won'
-      preLoaderRoute: typeof AppWonRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile': {
@@ -473,13 +442,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBrainRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/billing': {
-      id: '/_app/billing'
-      path: '/billing'
-      fullPath: '/billing'
-      preLoaderRoute: typeof AppBillingRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/analytics': {
       id: '/_app/analytics'
       path: '/analytics'
@@ -525,7 +487,6 @@ const AppOutreachRouteWithChildren = AppOutreachRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
-  AppBillingRoute: typeof AppBillingRoute
   AppBrainRoute: typeof AppBrainRoute
   AppConversationsRoute: typeof AppConversationsRoute
   AppDiscoveryRoute: typeof AppDiscoveryRoute
@@ -542,13 +503,11 @@ interface AppRouteChildren {
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppOutreachRoute: typeof AppOutreachRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
-  AppWonRoute: typeof AppWonRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
-  AppBillingRoute: AppBillingRoute,
   AppBrainRoute: AppBrainRoute,
   AppConversationsRoute: AppConversationsRoute,
   AppDiscoveryRoute: AppDiscoveryRoute,
@@ -565,7 +524,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppOnboardingRoute: AppOnboardingRoute,
   AppOutreachRoute: AppOutreachRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
-  AppWonRoute: AppWonRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

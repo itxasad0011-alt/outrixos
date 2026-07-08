@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Users2, Send,
-  MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, Plug, CreditCard, Bell, LogOut, Settings, Keyboard, LifeBuoy, ChevronsUpDown,
+  MessagesSquare, Repeat, Sparkles, Calendar, XCircle,
+  BarChart3, Database, Plug, Bell, LogOut, Settings, Keyboard, LifeBuoy, ChevronsUpDown,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
