@@ -48,7 +48,6 @@ const groups = [
     items: [
       { title: "Interested", url: "/interested", icon: Sparkles },
       { title: "Meetings", url: "/meetings", icon: Calendar },
-      { title: "Warm Clients", url: "/won", icon: Trophy },
       { title: "Not Interested", url: "/not-interested", icon: XCircle },
     ],
   },
