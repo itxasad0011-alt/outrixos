@@ -425,62 +425,83 @@ export type Database = {
       }
       leads: {
         Row: {
+          ai_summary: string | null
           avatar_url: string | null
           company: string | null
           company_size: string | null
+          company_website: string | null
           country: string | null
           created_at: string
+          email: string | null
           full_name: string
           headline: string | null
           icp_score: number | null
           id: string
           industry: string | null
+          job_title: string | null
           last_activity_at: string | null
           linkedin_url: string | null
+          location: string | null
+          notes: string | null
           role: string | null
           source: string
           status: string
           status_reason: string | null
+          tags: string[]
           updated_at: string
           user_id: string
         }
         Insert: {
+          ai_summary?: string | null
           avatar_url?: string | null
           company?: string | null
           company_size?: string | null
+          company_website?: string | null
           country?: string | null
           created_at?: string
+          email?: string | null
           full_name: string
           headline?: string | null
           icp_score?: number | null
           id?: string
           industry?: string | null
+          job_title?: string | null
           last_activity_at?: string | null
           linkedin_url?: string | null
+          location?: string | null
+          notes?: string | null
           role?: string | null
           source?: string
           status?: string
           status_reason?: string | null
+          tags?: string[]
           updated_at?: string
           user_id: string
         }
         Update: {
+          ai_summary?: string | null
           avatar_url?: string | null
           company?: string | null
           company_size?: string | null
+          company_website?: string | null
           country?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string
           headline?: string | null
           icp_score?: number | null
           id?: string
           industry?: string | null
+          job_title?: string | null
           last_activity_at?: string | null
           linkedin_url?: string | null
+          location?: string | null
+          notes?: string | null
           role?: string | null
           source?: string
           status?: string
           status_reason?: string | null
+          tags?: string[]
           updated_at?: string
           user_id?: string
         }
