@@ -173,7 +173,7 @@ async function buildBrainContext(supabase: any, userId: string): Promise<string>
     if (brain.custom_instructions) parts.push(`Custom instructions: ${brain.custom_instructions}`);
     if (brain.website) parts.push(`Website: ${brain.website}`);
   }
-  if (docs?.length) parts.push(`Knowledge:\n${docs.map((d: any) => `- ${d.title}: ${d.summary ?? ""}`).join("\n")}`);
+  if (docs?.length) parts.push(`Knowledge:\n${docs.map((d: any) => `- [${d.kind}] ${d.title}: ${(d.content ?? "").slice(0, 200)}`).join("\n")}`);
   return parts.join("\n");
 }
 
