@@ -21,6 +21,7 @@ import { Route as AppNotInterestedRouteImport } from './routes/_app.not-interest
 import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
 import { Route as AppManualLeadsRouteImport } from './routes/_app.manual-leads'
+import { Route as AppLeadsRouteImport } from './routes/_app.leads'
 import { Route as AppKnowledgeRouteImport } from './routes/_app.knowledge'
 import { Route as AppInterestedRouteImport } from './routes/_app.interested'
 import { Route as AppIntegrationsRouteImport } from './routes/_app.integrations'
@@ -91,6 +92,11 @@ const AppMeetingsRoute = AppMeetingsRouteImport.update({
 const AppManualLeadsRoute = AppManualLeadsRouteImport.update({
   id: '/manual-leads',
   path: '/manual-leads',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeadsRoute = AppLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
   getParentRoute: () => AppRoute,
 } as any)
 const AppKnowledgeRoute = AppKnowledgeRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof AppIntegrationsRoute
   '/interested': typeof AppInterestedRoute
   '/knowledge': typeof AppKnowledgeRoute
+  '/leads': typeof AppLeadsRoute
   '/manual-leads': typeof AppManualLeadsRoute
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof AppIntegrationsRoute
   '/interested': typeof AppInterestedRoute
   '/knowledge': typeof AppKnowledgeRoute
+  '/leads': typeof AppLeadsRoute
   '/manual-leads': typeof AppManualLeadsRoute
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/_app/integrations': typeof AppIntegrationsRoute
   '/_app/interested': typeof AppInterestedRoute
   '/_app/knowledge': typeof AppKnowledgeRoute
+  '/_app/leads': typeof AppLeadsRoute
   '/_app/manual-leads': typeof AppManualLeadsRoute
   '/_app/meetings': typeof AppMeetingsRoute
   '/_app/memory': typeof AppMemoryRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/interested'
     | '/knowledge'
+    | '/leads'
     | '/manual-leads'
     | '/meetings'
     | '/memory'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/interested'
     | '/knowledge'
+    | '/leads'
     | '/manual-leads'
     | '/meetings'
     | '/memory'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/_app/integrations'
     | '/_app/interested'
     | '/_app/knowledge'
+    | '/_app/leads'
     | '/_app/manual-leads'
     | '/_app/meetings'
     | '/_app/memory'
@@ -403,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/manual-leads'
       fullPath: '/manual-leads'
       preLoaderRoute: typeof AppManualLeadsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/leads': {
+      id: '/_app/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AppLeadsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/knowledge': {
@@ -514,6 +533,7 @@ interface AppRouteChildren {
   AppIntegrationsRoute: typeof AppIntegrationsRoute
   AppInterestedRoute: typeof AppInterestedRoute
   AppKnowledgeRoute: typeof AppKnowledgeRoute
+  AppLeadsRoute: typeof AppLeadsRoute
   AppManualLeadsRoute: typeof AppManualLeadsRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppMemoryRoute: typeof AppMemoryRoute
@@ -536,6 +556,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppIntegrationsRoute: AppIntegrationsRoute,
   AppInterestedRoute: AppInterestedRoute,
   AppKnowledgeRoute: AppKnowledgeRoute,
+  AppLeadsRoute: AppLeadsRoute,
   AppManualLeadsRoute: AppManualLeadsRoute,
   AppMeetingsRoute: AppMeetingsRoute,
   AppMemoryRoute: AppMemoryRoute,

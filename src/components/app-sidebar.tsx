@@ -2,7 +2,7 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  LayoutDashboard, User, Brain, BookOpen, Search, UserPlus, Send,
+  LayoutDashboard, User, Brain, BookOpen, Users2, Send,
   MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
   BarChart3, Database, Plug, CreditCard, Bell, LogOut, Settings, Keyboard, LifeBuoy, ChevronsUpDown,
 } from "lucide-react";
@@ -30,10 +30,9 @@ const groups = [
     ],
   },
   {
-    label: "Discover",
+    label: "Leads",
     items: [
-      { title: "Lead Discovery", url: "/discovery", icon: Search },
-      { title: "Manual Leads", url: "/manual-leads", icon: UserPlus },
+      { title: "Leads", url: "/leads", icon: Users2 },
     ],
   },
   {
