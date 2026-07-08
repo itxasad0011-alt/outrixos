@@ -1080,7 +1080,11 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
 
   const m = useMutation({
     mutationFn: (campaignIds?: string[]) => addFn({ data: { lead_ids: leadIds, campaign_ids: campaignIds ?? [...selected] } }),
-    onSuccess: (_r, campaignIds) => { toast.success(`Added ${leadIds.length} lead${leadIds.length === 1 ? "" : "s"} to ${campaignIds?.length ?? selected.size} campaign${(campaignIds?.length ?? selected.size) === 1 ? "" : "s"}`); onDone(); },
+    onSuccess: (_r, campaignIds) => {
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      toast.success(`Added ${leadIds.length} lead${leadIds.length === 1 ? "" : "s"} to ${campaignIds?.length ?? selected.size} campaign${(campaignIds?.length ?? selected.size) === 1 ? "" : "s"}`);
+      onDone();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
   const createM = useMutation({
@@ -1111,7 +1115,7 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
         <DialogHeader>
           <div className="px-6 pt-6">
             <DialogTitle>Add {leadIds.length} lead{leadIds.length === 1 ? "" : "s"} to campaign</DialogTitle>
-            <DialogDescription className="mt-1">Search campaigns, click one to add immediately, or create a new campaign here.</DialogDescription>
+            <DialogDescription className="mt-1">Search campaigns, select one or more, then add the selected leads.</DialogDescription>
           </div>
         </DialogHeader>
         <div className="space-y-4 px-6">
@@ -1158,8 +1162,8 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
                   key={c.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() => m.mutate([c.id])}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); m.mutate([c.id]); } }}
+                  onClick={() => { const next = new Set(selected); if (on) next.delete(c.id); else next.add(c.id); setSelected(next); }}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); const next = new Set(selected); if (on) next.delete(c.id); else next.add(c.id); setSelected(next); } }}
                   className="group w-full cursor-pointer rounded-2xl border border-border/70 bg-white p-4 text-left shadow-sm shadow-black/[0.02] transition hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex items-start gap-3">
