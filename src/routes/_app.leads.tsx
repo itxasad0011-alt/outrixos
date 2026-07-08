@@ -21,7 +21,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -663,16 +662,23 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
 
   return (
     <>
-      <Sheet open={!!lead} modal={false} onOpenChange={(o) => !o && onClose()}>
-        <SheetContent
-          hideOverlay
-          onInteractOutside={(e) => e.preventDefault()}
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onFocusOutside={(e) => e.preventDefault()}
-          className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]"
+      <aside
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="lead-details-title"
+        aria-describedby="lead-details-description"
+        className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-hidden border-l border-border bg-background p-0 shadow-xl sm:max-w-[680px]"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 z-20 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring"
+          aria-label="Close lead details"
         >
-          <SheetHeader className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
-            <SheetDescription className="sr-only">Lead details, AI summary, activity timeline, notes, campaign history, and next actions.</SheetDescription>
+          <X className="h-4 w-4" />
+        </button>
+          <div className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
+            <p id="lead-details-description" className="sr-only">Lead details, AI summary, activity timeline, notes, campaign history, and next actions.</p>
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 rounded-2xl ring-1 ring-border/70">
                 <AvatarImage src={lead.avatar_url ?? undefined} />
@@ -681,7 +687,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <SheetTitle className="truncate text-[22px] font-semibold tracking-tight">{lead.full_name}</SheetTitle>
+                    <h2 id="lead-details-title" className="truncate text-[22px] font-semibold tracking-tight text-foreground">{lead.full_name}</h2>
                     <div className="mt-1 truncate text-[13.5px] text-muted-foreground">{lead.role ?? lead.job_title ?? "Role unknown"}{lead.company ? ` · ${lead.company}` : ""}</div>
                   </div>
                   <Badge className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] ${sc.cls}`}>{lead.icp_score ?? 0} · {sc.label}</Badge>
@@ -693,7 +699,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
                 </div>
               </div>
             </div>
-          </SheetHeader>
+          </div>
 
           <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col overflow-hidden bg-[oklch(0.985_0.003_260)]">
             <TabsList className="mx-7 mt-4 h-10 justify-start gap-1 rounded-xl border border-border/70 bg-white p-1">
@@ -842,8 +848,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </SheetContent>
-      </Sheet>
+      </aside>
       <AddToCampaignDialog
         open={campaignDialogOpen}
         onClose={() => setCampaignDialogOpen(false)}
