@@ -161,7 +161,7 @@ export const saveSequence = createServerFn({ method: "POST" })
 async function buildBrainContext(supabase: any, userId: string): Promise<string> {
   const [{ data: brain }, { data: docs }] = await Promise.all([
     supabase.from("sales_brain").select("*").eq("user_id", userId).maybeSingle(),
-    supabase.from("knowledge_docs").select("title,summary").eq("user_id", userId).limit(10),
+    supabase.from("knowledge_docs").select("title,kind,content").eq("user_id", userId).limit(10),
   ]);
   const parts: string[] = [];
   if (brain) {
