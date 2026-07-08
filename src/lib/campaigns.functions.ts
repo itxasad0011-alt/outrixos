@@ -94,6 +94,32 @@ export const updateCampaignStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const updateSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(120).optional(),
+  description: z.string().max(500).nullable().optional(),
+  sender_account: z.string().max(200).nullable().optional(),
+  daily_limit: z.number().int().min(1).max(200).optional(),
+  working_days: z.array(z.string()).optional(),
+  working_hours_start: z.string().optional(),
+  working_hours_end: z.string().optional(),
+  timezone: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  favorite: z.boolean().optional(),
+});
+
+export const updateCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => updateSchema.parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { id, ...patch } = data;
+    const { error } = await supabase.from("campaigns")
+      .update(patch).eq("id", id).eq("user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const deleteCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
