@@ -47,9 +47,9 @@ function Dashboard() {
         yLeads, yConvos, yMeetings,
       ] = await Promise.all([
         supabase.from("leads").select("id", { count: "exact", head: true }),
-        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["messaged", "replied", "interested", "meeting", "won", "warm"]),
-        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["replied", "interested", "meeting", "won", "warm"]),
-        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["interested", "meeting", "won", "warm"]),
+        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["messaged", "replied", "interested", "meeting", "won"]),
+        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["replied", "interested", "meeting", "won"]),
+        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["interested", "meeting", "won"]),
         supabase.from("meetings").select("id", { count: "exact", head: true }),
         supabase.from("activity_log").select("*").order("created_at", { ascending: false }).limit(5),
         supabase.from("leads").select("status"),
