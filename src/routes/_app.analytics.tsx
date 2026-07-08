@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,12 +54,15 @@ const kpis = [
 ];
 
 function Analytics() {
+  const ranges = ["Last 30 days", "Last 90 days", "Year to date"];
+  const [rangeIndex, setRangeIndex] = useState(1);
+  const range = ranges[rangeIndex];
   return (
     <div>
       <PageHeader
         title="Analytics"
         description="Sales-focused metrics only — no vanity numbers."
-        actions={<Button variant="outline" className="h-9 rounded-xl border-border/70 bg-white text-[12.5px]"><Filter className="mr-1.5 h-3.5 w-3.5" />Last 90 days</Button>}
+        actions={<Button variant="outline" onClick={() => setRangeIndex((i) => (i + 1) % ranges.length)} className="h-9 rounded-xl border-border/70 bg-white text-[12.5px]" aria-label="Change analytics date range"><Filter className="mr-1.5 h-3.5 w-3.5" />{range}</Button>}
       />
       <div className="grid grid-cols-2 gap-3 p-8 md:grid-cols-5">
         {kpis.map((k) => (

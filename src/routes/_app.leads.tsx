@@ -21,7 +21,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -107,8 +106,13 @@ function useViewPref() {
 function LeadsPage() {
   const qc = useQueryClient();
   const [view, setView] = useViewPref();
-  const [search, setSearch] = useState("");
-  const [debounced, setDebounced] = useState("");
+  const [search, setSearch] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const pending = localStorage.getItem("leads.globalSearch") ?? "";
+    localStorage.removeItem("leads.globalSearch");
+    return pending;
+  });
+  const [debounced, setDebounced] = useState(search);
   useEffect(() => { const t = setTimeout(() => setDebounced(search), 300); return () => clearTimeout(t); }, [search]);
 
   const [filters, setFilters] = useState<{
@@ -161,6 +165,21 @@ function LeadsPage() {
     if (next.has(id)) next.delete(id); else next.add(id);
     setSelected(next);
   }
+
+  function openAndSelectLead(lead: any) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.add(lead.id);
+      return next;
+    });
+    setOpenLead(lead);
+  }
+
+  useEffect(() => {
+    if (!openLead) return;
+    const fresh = rows.find((r: any) => r.id === openLead.id);
+    if (fresh && fresh !== openLead) setOpenLead(fresh);
+  }, [rows, openLead]);
 
   function exportCsv() {
     const cols = ["full_name", "role", "job_title", "company", "industry", "country", "location", "company_size", "email", "linkedin_url", "source", "status", "icp_score", "tags", "created_at"];
@@ -299,12 +318,12 @@ function LeadsPage() {
                 lead={l}
                 selected={selected.has(l.id)}
                 onToggle={() => toggleOne(l.id)}
-                onOpen={() => setOpenLead(l)}
+                onOpen={() => openAndSelectLead(l)}
               />
             ))}
           </div>
         ) : (
-          <LeadsTable rows={rows} selected={selected} allSelected={allSelected} toggleAll={toggleAll} toggleOne={toggleOne} onOpen={setOpenLead} />
+          <LeadsTable rows={rows} selected={selected} allSelected={allSelected} toggleAll={toggleAll} toggleOne={toggleOne} onOpen={openAndSelectLead} />
         )}
 
         {/* Pagination */}
@@ -643,9 +662,23 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
 
   return (
     <>
-      <Sheet open={!!lead} onOpenChange={(o) => !o && onClose()}>
-        <SheetContent className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
-          <SheetHeader className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
+      <aside
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="lead-details-title"
+        aria-describedby="lead-details-description"
+        className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-hidden border-l border-border bg-background p-0 shadow-xl sm:max-w-[680px]"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 z-20 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring"
+          aria-label="Close lead details"
+        >
+          <X className="h-4 w-4" />
+        </button>
+          <div className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
+            <p id="lead-details-description" className="sr-only">Lead details, AI summary, activity timeline, notes, campaign history, and next actions.</p>
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 rounded-2xl ring-1 ring-border/70">
                 <AvatarImage src={lead.avatar_url ?? undefined} />
@@ -654,7 +687,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <SheetTitle className="truncate text-[22px] font-semibold tracking-tight">{lead.full_name}</SheetTitle>
+                    <h2 id="lead-details-title" className="truncate text-[22px] font-semibold tracking-tight text-foreground">{lead.full_name}</h2>
                     <div className="mt-1 truncate text-[13.5px] text-muted-foreground">{lead.role ?? lead.job_title ?? "Role unknown"}{lead.company ? ` · ${lead.company}` : ""}</div>
                   </div>
                   <Badge className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] ${sc.cls}`}>{lead.icp_score ?? 0} · {sc.label}</Badge>
@@ -666,7 +699,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
                 </div>
               </div>
             </div>
-          </SheetHeader>
+          </div>
 
           <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col overflow-hidden bg-[oklch(0.985_0.003_260)]">
             <TabsList className="mx-7 mt-4 h-10 justify-start gap-1 rounded-xl border border-border/70 bg-white p-1">
@@ -815,8 +848,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </SheetContent>
-      </Sheet>
+      </aside>
       <AddToCampaignDialog
         open={campaignDialogOpen}
         onClose={() => setCampaignDialogOpen(false)}
@@ -1060,7 +1092,11 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
 
   const m = useMutation({
     mutationFn: (campaignIds?: string[]) => addFn({ data: { lead_ids: leadIds, campaign_ids: campaignIds ?? [...selected] } }),
-    onSuccess: (_r, campaignIds) => { toast.success(`Added ${leadIds.length} lead${leadIds.length === 1 ? "" : "s"} to ${campaignIds?.length ?? selected.size} campaign${(campaignIds?.length ?? selected.size) === 1 ? "" : "s"}`); onDone(); },
+    onSuccess: (_r, campaignIds) => {
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      toast.success(`Added ${leadIds.length} lead${leadIds.length === 1 ? "" : "s"} to ${campaignIds?.length ?? selected.size} campaign${(campaignIds?.length ?? selected.size) === 1 ? "" : "s"}`);
+      onDone();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
   const createM = useMutation({
@@ -1091,7 +1127,7 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
         <DialogHeader>
           <div className="px-6 pt-6">
             <DialogTitle>Add {leadIds.length} lead{leadIds.length === 1 ? "" : "s"} to campaign</DialogTitle>
-            <DialogDescription className="mt-1">Search campaigns, click one to add immediately, or create a new campaign here.</DialogDescription>
+            <DialogDescription className="mt-1">Search campaigns, select one or more, then add the selected leads.</DialogDescription>
           </div>
         </DialogHeader>
         <div className="space-y-4 px-6">
@@ -1138,8 +1174,8 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
                   key={c.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() => m.mutate([c.id])}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); m.mutate([c.id]); } }}
+                  onClick={() => { const next = new Set(selected); if (on) next.delete(c.id); else next.add(c.id); setSelected(next); }}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); const next = new Set(selected); if (on) next.delete(c.id); else next.add(c.id); setSelected(next); } }}
                   className="group w-full cursor-pointer rounded-2xl border border-border/70 bg-white p-4 text-left shadow-sm shadow-black/[0.02] transition hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex items-start gap-3">
