@@ -9,7 +9,7 @@ import {
   generateLeadAiSummary, deleteLead, leadTimeline,
 } from "@/lib/leads.functions";
 import { discoverLeads, runOutreach } from "@/lib/ai/agent.functions";
-import { listCampaigns } from "@/lib/campaigns.functions";
+import { listCampaigns, createCampaign } from "@/lib/campaigns.functions";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -574,6 +574,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
   const [notes, setNotes] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [campaignDialogOpen, setCampaignDialogOpen] = useState(false);
 
   useEffect(() => {
     setTab("overview");
@@ -629,151 +630,219 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
 
   if (!lead) return null;
   const sc = scoreLabel(lead.icp_score);
+  const timelineItems = timelineQ.data?.activity ?? [];
+  const campaignItems = timelineQ.data?.campaigns ?? [];
+  const conversation = timelineQ.data?.conversation;
+  const nextAction = lead.status === "new"
+    ? "Add to a campaign and send the first personalized touch."
+    : lead.status === "conversation"
+      ? "Review the latest reply and move toward a meeting."
+      : lead.status === "interested"
+        ? "Book a meeting while intent is warm."
+        : "Refresh the AI summary and choose the next outreach step.";
 
   return (
-    <Sheet open={!!lead} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="flex w-full flex-col p-0 sm:max-w-[600px]">
-        <SheetHeader className="border-b border-border/60 px-6 pb-4 pt-6">
-          <div className="flex items-start gap-3">
-            <Avatar className="h-14 w-14">
-              <AvatarImage src={lead.avatar_url ?? undefined} />
-              <AvatarFallback className="bg-gradient-to-br from-neutral-900 to-neutral-700 text-[13px] text-white">{initials(lead.full_name)}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <SheetTitle className="truncate text-[17px]">{lead.full_name}</SheetTitle>
-              <div className="mt-0.5 truncate text-[12.5px] text-muted-foreground">{lead.role ?? lead.job_title ?? "—"}{lead.company ? ` · ${lead.company}` : ""}</div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                <Badge className={`rounded-full border text-[10.5px] ${sc.cls}`}>{lead.icp_score ?? 0} · {sc.label}</Badge>
-                <Badge variant="outline" className={`rounded-md text-[10.5px] capitalize ${statusTone(lead.status)}`}>{lead.status.replace("_", " ")}</Badge>
-                <Badge variant="outline" className="rounded-md text-[10.5px]">{sourceBadge(lead.source)}</Badge>
+    <>
+      <Sheet open={!!lead} onOpenChange={(o) => !o && onClose()}>
+        <SheetContent className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
+          <SheetHeader className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
+            <div className="flex items-start gap-4">
+              <Avatar className="h-20 w-20 rounded-2xl ring-1 ring-border/70">
+                <AvatarImage src={lead.avatar_url ?? undefined} />
+                <AvatarFallback className="rounded-2xl bg-primary text-[18px] font-semibold text-primary-foreground">{initials(lead.full_name)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <SheetTitle className="truncate text-[22px] font-semibold tracking-tight">{lead.full_name}</SheetTitle>
+                    <div className="mt-1 truncate text-[13.5px] text-muted-foreground">{lead.role ?? lead.job_title ?? "Role unknown"}{lead.company ? ` · ${lead.company}` : ""}</div>
+                  </div>
+                  <Badge className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] ${sc.cls}`}>{lead.icp_score ?? 0} · {sc.label}</Badge>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <MiniStat label="Status" value={lead.status.replace("_", " ")} />
+                  <MiniStat label="Source" value={sourceBadge(lead.source)} />
+                  <MiniStat label="Last activity" value={timeAgo(lead.last_activity_at ?? lead.created_at)} />
+                </div>
               </div>
             </div>
-          </div>
-        </SheetHeader>
+          </SheetHeader>
 
-        <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col overflow-hidden">
-          <TabsList className="mx-6 mt-3 h-9 justify-start gap-1 bg-transparent p-0">
-            {["overview", "timeline", "notes"].map((t) => (
-              <TabsTrigger key={t} value={t} className="h-8 rounded-lg px-3 text-[12.5px] capitalize data-[state=active]:bg-neutral-900 data-[state=active]:text-white">{t}</TabsTrigger>
-            ))}
-          </TabsList>
-
-          <ScrollArea className="flex-1">
-            <TabsContent value="overview" className="m-0 space-y-4 p-6">
-              <Section title="LinkedIn & contact">
-                <div className="grid grid-cols-2 gap-2 text-[12.5px]">
-                  <Field icon={<Building2 className="h-3 w-3" />} label="Company" value={lead.company} />
-                  <Field icon={<Globe className="h-3 w-3" />} label="Website" value={lead.company_website} link />
-                  <Field icon={<Mail className="h-3 w-3" />} label="Email" value={lead.email} />
-                  <Field icon={<MapPin className="h-3 w-3" />} label="Location" value={lead.location ?? lead.country} />
-                  <Field label="Industry" value={lead.industry} />
-                  <Field label="Company size" value={lead.company_size} />
-                </div>
-                {lead.linkedin_url && (
-                  <a href={lead.linkedin_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-[12px] text-foreground hover:underline">
-                    View LinkedIn <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-              </Section>
-
-              <Section title="AI summary" action={
-                <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11.5px]" onClick={() => genM.mutate()} disabled={genM.isPending}>
-                  {genM.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />} Generate
-                </Button>
-              }>
-                <div className="whitespace-pre-line text-[12.5px] leading-relaxed">
-                  {lead.ai_summary ?? <span className="text-muted-foreground">Click Generate to create an AI-crafted summary of this lead.</span>}
-                </div>
-              </Section>
-
-              <Section title="Tags">
-                <div className="flex flex-wrap gap-1.5">
-                  {tags.map((t) => (
-                    <button key={t} onClick={() => removeTag(t)} className="group inline-flex items-center gap-1 rounded-full border border-border/70 bg-white px-2 py-0.5 text-[11px]">
-                      {t}<X className="h-2.5 w-2.5 opacity-40 group-hover:opacity-100" />
-                    </button>
-                  ))}
-                  <input
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
-                    placeholder="Add tag…"
-                    className="h-6 rounded-full border border-dashed border-border/70 bg-transparent px-2 text-[11px] outline-none placeholder:text-muted-foreground focus:border-foreground"
-                  />
-                </div>
-              </Section>
-
-              <Section title="Campaigns">
-                <div className="flex flex-wrap gap-1.5">
-                  {timelineQ.data?.campaigns.length ? timelineQ.data.campaigns.map((cl: any) => (
-                    <Link key={cl.id} to="/outreach/$campaignId" params={{ campaignId: cl.campaign?.id }}
-                      className="rounded-full border border-border/70 bg-white px-2.5 py-0.5 text-[11px] hover:bg-neutral-50">
-                      {cl.campaign?.name ?? "Campaign"} · <span className="text-muted-foreground capitalize">{cl.status}</span>
-                    </Link>
-                  )) : <span className="text-[12px] text-muted-foreground">Not in any campaign yet.</span>}
-                </div>
-              </Section>
-            </TabsContent>
-
-            <TabsContent value="timeline" className="m-0 space-y-2 p-6">
-              {(timelineQ.data?.activity ?? []).length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-[12px] text-muted-foreground">No activity yet.</div>
-              ) : (
-                <div className="space-y-3">
-                  {timelineQ.data!.activity.map((a: any) => (
-                    <div key={a.id} className="flex gap-3">
-                      <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-900" />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[12.5px] font-medium">{a.title}</div>
-                        {a.detail && <div className="text-[11.5px] text-muted-foreground">{a.detail}</div>}
-                        <div className="text-[10.5px] text-muted-foreground/70">{new Date(a.created_at).toLocaleString()}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="notes" className="m-0 p-6">
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Private notes about this lead…" className="min-h-[220px] rounded-xl" />
-              <div className="mt-2 flex justify-end">
-                <Button size="sm" className="rounded-lg bg-[#0A0A0A] hover:bg-[#262626]" onClick={() => saveNotes.mutate()} disabled={saveNotes.isPending}>
-                  {saveNotes.isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null} Save notes
-                </Button>
-              </div>
-            </TabsContent>
-          </ScrollArea>
-        </Tabs>
-
-        <div className="flex items-center gap-2 border-t border-border/60 p-4">
-          <Button size="sm" className="h-9 flex-1 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]" onClick={() => outM.mutate()} disabled={outM.isPending}>
-            <Send className="mr-1.5 h-3.5 w-3.5" /> Start outreach
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline" className="h-9 rounded-lg">Mark as <ChevronDown className="ml-1 h-3 w-3" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl">
-              {["qualified", "contacted", "interested", "meeting", "won", "not_interested"].map((s) => (
-                <DropdownMenuItem key={s} className="capitalize" onSelect={() => setStatus.mutate(s)}>{s.replace("_", " ")}</DropdownMenuItem>
+          <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col overflow-hidden bg-[oklch(0.985_0.003_260)]">
+            <TabsList className="mx-7 mt-4 h-10 justify-start gap-1 rounded-xl border border-border/70 bg-white p-1">
+              {["overview", "timeline", "notes"].map((t) => (
+                <TabsTrigger key={t} value={t} className="h-8 rounded-lg px-3 text-[12.5px] capitalize data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">{t}</TabsTrigger>
               ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => delM.mutate()}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete lead
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </SheetContent>
-    </Sheet>
+            </TabsList>
+
+            <ScrollArea className="flex-1">
+              <TabsContent value="overview" className="m-0 space-y-4 p-7">
+                <Section title="Next suggested action" icon={<Sparkles className="h-3.5 w-3.5" />}>
+                  <div className="rounded-xl border border-border/60 bg-secondary/60 p-3 text-[13px] leading-relaxed text-foreground">{nextAction}</div>
+                </Section>
+
+                <Section title="AI summary" icon={<Sparkles className="h-3.5 w-3.5" />} action={
+                  <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11.5px]" onClick={() => genM.mutate()} disabled={genM.isPending}>
+                    {genM.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />} Generate
+                  </Button>
+                }>
+                  <div className="whitespace-pre-line text-[13px] leading-relaxed">
+                    {lead.ai_summary ?? <span className="text-muted-foreground">Generate a concise selling angle, qualification signal, and personalization hook for this lead.</span>}
+                  </div>
+                </Section>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Section title="LinkedIn information" icon={<ExternalLink className="h-3.5 w-3.5" />}>
+                    <div className="space-y-3 text-[12.5px]">
+                      <Field label="Headline" value={lead.headline} />
+                      <Field label="Profile" value={lead.linkedin_url} link />
+                      <Field icon={<Mail className="h-3 w-3" />} label="Email" value={lead.email} />
+                    </div>
+                  </Section>
+                  <Section title="Company information" icon={<Building2 className="h-3.5 w-3.5" />}>
+                    <div className="space-y-3 text-[12.5px]">
+                      <Field icon={<Building2 className="h-3 w-3" />} label="Company" value={lead.company} />
+                      <Field icon={<Globe className="h-3 w-3" />} label="Website" value={lead.company_website} link />
+                      <Field icon={<MapPin className="h-3 w-3" />} label="Market" value={[lead.industry, lead.company_size, lead.location ?? lead.country].filter(Boolean).join(" · ")} />
+                    </div>
+                  </Section>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Section title="Conversation status" icon={<MessageSquare className="h-3.5 w-3.5" />}>
+                    <div className="space-y-2 text-[12.5px]">
+                      <Badge variant="outline" className="rounded-full capitalize">{conversation?.intent ? `Intent: ${conversation.intent}` : "No detected intent"}</Badge>
+                      <div className="text-muted-foreground">{conversation?.last_message_at ? `Last message ${timeAgo(conversation.last_message_at)}` : "No conversation started yet."}</div>
+                    </div>
+                  </Section>
+                  <Section title="Recent activity" icon={<Calendar className="h-3.5 w-3.5" />}>
+                    {timelineItems[0] ? (
+                      <div className="text-[12.5px]">
+                        <div className="font-medium">{timelineItems[0].title}</div>
+                        <div className="mt-0.5 text-muted-foreground">{timelineItems[0].detail ?? new Date(timelineItems[0].created_at).toLocaleString()}</div>
+                      </div>
+                    ) : <div className="text-[12.5px] text-muted-foreground">No tracked activity yet.</div>}
+                  </Section>
+                </div>
+
+                <Section title="Campaign history" icon={<Send className="h-3.5 w-3.5" />} action={
+                  <Button variant="outline" size="sm" className="h-7 rounded-lg text-[11.5px]" onClick={() => setCampaignDialogOpen(true)}>Add</Button>
+                }>
+                  <div className="flex flex-wrap gap-2">
+                    {campaignItems.length ? campaignItems.map((cl: any) => (
+                      <Link key={cl.id} to="/outreach/$campaignId" params={{ campaignId: cl.campaign?.id }}
+                        className="rounded-full border border-border/70 bg-secondary/70 px-2.5 py-1 text-[11px] transition hover:bg-secondary">
+                        {cl.campaign?.name ?? "Campaign"} · <span className="text-muted-foreground capitalize">{cl.status}</span>
+                      </Link>
+                    )) : <span className="text-[12px] text-muted-foreground">Not enrolled in any campaign yet.</span>}
+                  </div>
+                </Section>
+
+                <Section title="Tags" icon={<TagIcon className="h-3.5 w-3.5" />}>
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map((t) => (
+                      <button key={t} onClick={() => removeTag(t)} className="group inline-flex items-center gap-1 rounded-full border border-border/70 bg-secondary/70 px-2.5 py-1 text-[11px] transition hover:bg-secondary">
+                        {t}<X className="h-2.5 w-2.5 opacity-40 group-hover:opacity-100" />
+                      </button>
+                    ))}
+                    <input
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+                      placeholder="Add tag…"
+                      className="h-7 rounded-full border border-dashed border-border/70 bg-white px-2.5 text-[11px] outline-none placeholder:text-muted-foreground focus:border-foreground"
+                    />
+                  </div>
+                </Section>
+              </TabsContent>
+
+              <TabsContent value="timeline" className="m-0 p-7">
+                <Section title="Timeline" icon={<Calendar className="h-3.5 w-3.5" />}>
+                  {timelineItems.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-[12px] text-muted-foreground">No activity yet.</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {timelineItems.map((a: any, i: number) => (
+                        <div key={a.id} className="grid grid-cols-[18px_minmax(0,1fr)] gap-3">
+                          <div className="relative flex justify-center">
+                            <div className="mt-1.5 h-2 w-2 rounded-full bg-primary" />
+                            {i < timelineItems.length - 1 && <div className="absolute top-4 h-full w-px bg-border" />}
+                          </div>
+                          <div className="rounded-xl border border-border/60 bg-secondary/50 p-3">
+                            <div className="text-[13px] font-medium">{a.title}</div>
+                            {a.detail && <div className="mt-0.5 text-[12px] text-muted-foreground">{a.detail}</div>}
+                            <div className="mt-1.5 text-[10.5px] text-muted-foreground/70">{new Date(a.created_at).toLocaleString()}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Section>
+              </TabsContent>
+
+              <TabsContent value="notes" className="m-0 p-7">
+                <Section title="Notes" icon={<TagIcon className="h-3.5 w-3.5" />}>
+                  <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Private notes, call prep, objections, buying committee details…" className="min-h-[260px] rounded-xl border-border/70 bg-secondary/40 text-[13px]" />
+                  <div className="mt-3 flex justify-end">
+                    <Button size="sm" className="rounded-lg" onClick={() => saveNotes.mutate()} disabled={saveNotes.isPending}>
+                      {saveNotes.isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null} Save notes
+                    </Button>
+                  </div>
+                </Section>
+              </TabsContent>
+            </ScrollArea>
+          </Tabs>
+
+          <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-2 border-t border-border/60 bg-white/90 p-4 backdrop-blur-xl">
+            <Button size="sm" className="h-9 flex-1 rounded-lg" onClick={() => outM.mutate()} disabled={outM.isPending}>
+              <Send className="mr-1.5 h-3.5 w-3.5" /> Start outreach
+            </Button>
+            <Button size="sm" variant="outline" className="h-9 rounded-lg" onClick={() => setCampaignDialogOpen(true)}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> Add to campaign
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="h-9 rounded-lg">Mark as <ChevronDown className="ml-1 h-3 w-3" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-xl">
+                {["qualified", "contacted", "interested", "meeting", "won", "not_interested"].map((s) => (
+                  <DropdownMenuItem key={s} className="capitalize" onSelect={() => setStatus.mutate(s)}>{s.replace("_", " ")}</DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => delM.mutate()}>
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete lead
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </SheetContent>
+      </Sheet>
+      <AddToCampaignDialog
+        open={campaignDialogOpen}
+        onClose={() => setCampaignDialogOpen(false)}
+        leadIds={[lead.id]}
+        onDone={() => { setCampaignDialogOpen(false); onChanged(); qc.invalidateQueries({ queryKey: ["lead.timeline", lead.id] }); }}
+      />
+    </>
   );
 }
 
-function Section({ title, action, children }: any) {
+function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-white p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{title}</div>
+    <div className="rounded-xl border border-border/60 bg-secondary/50 px-3 py-2">
+      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="mt-0.5 truncate text-[12px] font-medium capitalize">{value}</div>
+    </div>
+  );
+}
+
+function Section({ title, icon, action, children }: any) {
+  return (
+    <div className="rounded-2xl border border-border/70 bg-white p-4 shadow-sm shadow-black/[0.02]">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {icon}<span>{title}</span>
+        </div>
         {action}
       </div>
       {children}
@@ -781,11 +850,11 @@ function Section({ title, action, children }: any) {
   );
 }
 function Field({ icon, label, value, link }: any) {
-  if (!value) return <div><div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70">{label}</div><div className="text-muted-foreground">—</div></div>;
+  if (!value) return <div><div className="text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground/70">{label}</div><div className="text-muted-foreground">—</div></div>;
   return (
     <div>
-      <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground/70">{label}</div>
-      <div className="flex items-center gap-1 truncate">
+      <div className="text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground/70">{label}</div>
+      <div className="mt-0.5 flex items-center gap-1 truncate text-foreground">
         {icon}
         {link ? <a href={value.startsWith("http") ? value : `https://${value}`} target="_blank" rel="noreferrer" className="truncate hover:underline">{value}</a> : <span className="truncate">{value}</span>}
       </div>
@@ -974,48 +1043,118 @@ function DiscoverDialog({ open, onClose, onDone, kind }: any) {
 function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
   const listC = useServerFn(listCampaigns);
   const addFn = useServerFn(addLeadsToCampaigns);
-  const { data: campaigns = [] } = useQuery({ queryKey: ["campaigns"], queryFn: () => listC({}), enabled: open });
+  const createFn = useServerFn(createCampaign);
+  const qc = useQueryClient();
+  const { data: campaigns = [], isLoading } = useQuery({ queryKey: ["campaigns"], queryFn: () => listC({}), enabled: open });
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  useEffect(() => { if (open) setSelected(new Set()); }, [open]);
+  const [search, setSearch] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [newCampaign, setNewCampaign] = useState({ name: "", description: "" });
+  useEffect(() => { if (open) { setSelected(new Set()); setSearch(""); setCreating(false); setNewCampaign({ name: "", description: "" }); } }, [open]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return campaigns as any[];
+    return (campaigns as any[]).filter((c: any) => `${c.name} ${c.description ?? ""} ${c.status}`.toLowerCase().includes(q));
+  }, [campaigns, search]);
 
   const m = useMutation({
-    mutationFn: () => addFn({ data: { lead_ids: leadIds, campaign_ids: [...selected] } }),
-    onSuccess: () => { toast.success("Added to campaigns"); onDone(); },
+    mutationFn: (campaignIds?: string[]) => addFn({ data: { lead_ids: leadIds, campaign_ids: campaignIds ?? [...selected] } }),
+    onSuccess: (_r, campaignIds) => { toast.success(`Added ${leadIds.length} lead${leadIds.length === 1 ? "" : "s"} to ${campaignIds?.length ?? selected.size} campaign${(campaignIds?.length ?? selected.size) === 1 ? "" : "s"}`); onDone(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const createM = useMutation({
+    mutationFn: async () => {
+      const campaign = await createFn({ data: {
+        name: newCampaign.name.trim(),
+        description: newCampaign.description.trim() || undefined,
+        daily_limit: 20,
+        working_days: ["mon", "tue", "wed", "thu", "fri"],
+        working_hours_start: "09:00",
+        working_hours_end: "17:00",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+      } });
+      await addFn({ data: { lead_ids: leadIds, campaign_ids: [(campaign as any).id] } });
+      return campaign;
+    },
+    onSuccess: () => {
+      toast.success(`Campaign created and ${leadIds.length} lead${leadIds.length === 1 ? "" : "s"} added`);
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      onDone();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-2xl sm:max-w-md">
+      <DialogContent className="rounded-2xl p-0 sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Add {leadIds.length} lead{leadIds.length === 1 ? "" : "s"} to campaign</DialogTitle>
+          <div className="px-6 pt-6">
+            <DialogTitle>Add {leadIds.length} lead{leadIds.length === 1 ? "" : "s"} to campaign</DialogTitle>
+            <DialogDescription className="mt-1">Search campaigns, click one to add immediately, or create a new campaign here.</DialogDescription>
+          </div>
         </DialogHeader>
-        <div className="max-h-[50vh] space-y-1.5 overflow-y-auto">
-          {campaigns.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border/70 p-4 text-center text-[12px] text-muted-foreground">
-              No campaigns yet. <Link to="/outreach" className="underline">Create one</Link>.
+        <div className="space-y-4 px-6">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search campaigns…" className="h-10 rounded-xl pl-9 text-[13px]" autoFocus />
             </div>
-          ) : campaigns.map((c: any) => {
-            const on = selected.has(c.id);
-            return (
-              <button key={c.id} onClick={() => {
-                const next = new Set(selected);
-                if (on) next.delete(c.id); else next.add(c.id);
-                setSelected(next);
-              }} className={`flex w-full items-center gap-2.5 rounded-xl border p-3 text-left transition ${on ? "border-neutral-900 bg-neutral-50" : "border-border/70 bg-white hover:bg-neutral-50"}`}>
-                <Checkbox checked={on} />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13px] font-medium">{c.name}</div>
-                  <div className="text-[11.5px] text-muted-foreground capitalize">{c.status} · {c.total_leads} leads</div>
+            <Button variant="outline" className="h-10 rounded-xl" onClick={() => setCreating((v) => !v)}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> New
+            </Button>
+          </div>
+
+          {creating && (
+            <div className="rounded-2xl border border-border/70 bg-secondary/40 p-4">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                <div className="space-y-1.5">
+                  <Label className="text-[12px]">Campaign name</Label>
+                  <Input value={newCampaign.name} onChange={(e) => setNewCampaign({ ...newCampaign, name: e.target.value })} className="h-9 rounded-lg" placeholder="Q3 founder outreach" />
                 </div>
-              </button>
-            );
-          })}
+                <div className="space-y-1.5">
+                  <Label className="text-[12px]">Description</Label>
+                  <Input value={newCampaign.description} onChange={(e) => setNewCampaign({ ...newCampaign, description: e.target.value })} className="h-9 rounded-lg" placeholder="Optional" />
+                </div>
+              </div>
+              <Button className="mt-3 h-9 rounded-lg" onClick={() => createM.mutate()} disabled={createM.isPending || !newCampaign.name.trim()}>
+                {createM.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Plus className="mr-1.5 h-3.5 w-3.5" />} Create and add leads
+              </Button>
+            </div>
+          )}
+
+          <div className="max-h-[46vh] space-y-2 overflow-y-auto pr-1">
+            {isLoading ? (
+              <div className="grid place-items-center rounded-2xl border border-border/70 py-12"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+            ) : filtered.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/70 p-8 text-center text-[12px] text-muted-foreground">
+                No matching campaigns. Create one above without leaving this flow.
+              </div>
+            ) : filtered.map((c: any) => {
+              const on = selected.has(c.id);
+              const pct = c.total_leads ? Math.round((c.completed_leads / c.total_leads) * 100) : 0;
+              return (
+                <button key={c.id} onClick={() => m.mutate([c.id])} className="group w-full rounded-2xl border border-border/70 bg-white p-4 text-left shadow-sm shadow-black/[0.02] transition hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md">
+                  <div className="flex items-start gap-3">
+                    <Checkbox checked={on} onClick={(e) => { e.stopPropagation(); const next = new Set(selected); if (on) next.delete(c.id); else next.add(c.id); setSelected(next); }} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="truncate text-[13.5px] font-semibold">{c.name}</div>
+                        <Badge variant="outline" className="rounded-full text-[10.5px] capitalize">{c.status}</Badge>
+                      </div>
+                      <div className="mt-1 text-[11.5px] text-muted-foreground">{c.total_leads} active leads · {c.replied_leads} replies · {pct}% complete</div>
+                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} /></div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="border-t border-border/60 bg-secondary/30 px-6 py-4">
           <Button variant="ghost" className="rounded-lg" onClick={onClose}>Cancel</Button>
-          <Button className="rounded-lg bg-[#0A0A0A] hover:bg-[#262626]" onClick={() => m.mutate()} disabled={m.isPending || selected.size === 0}>
-            {m.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null} Add
+          <Button className="rounded-lg" onClick={() => m.mutate()} disabled={m.isPending || selected.size === 0}>
+            {m.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null} Add selected ({selected.size})
           </Button>
         </DialogFooter>
       </DialogContent>
