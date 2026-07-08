@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,8 +16,42 @@ export const Route = createFileRoute("/_app/integrations")({
 });
 
 function Integrations() {
-  const [linkedinConnected, setLinkedinConnected] = useState(true);
-  const [calendly, setCalendly] = useState("https://calendly.com/asad-farooq/30min");
+  const qc = useQueryClient();
+  const { data: profile } = useQuery({
+    queryKey: ["profile", "integrations"],
+    queryFn: async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return null;
+      const { data } = await supabase.from("profiles").select("id,email,full_name,linkedin_url,linkedin_connected").eq("id", user.user.id).maybeSingle();
+      return data;
+    },
+  });
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [calendly, setCalendly] = useState(() => typeof window === "undefined" ? "" : localStorage.getItem("outrix.calendly") ?? "");
+
+  useEffect(() => { setLinkedinUrl(profile?.linkedin_url ?? ""); }, [profile?.linkedin_url]);
+
+  const linkedin = useMutation({
+    mutationFn: async (connected: boolean) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error("Sign in required");
+      const { error } = await supabase.from("profiles").update({ linkedin_connected: connected, linkedin_url: linkedinUrl || null }).eq("id", user.user.id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, connected) => {
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      qc.invalidateQueries({ queryKey: ["profile", "integrations"] });
+      toast.success(connected ? "LinkedIn connected" : "LinkedIn disconnected");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const saveCalendly = () => {
+    if (!calendly.trim()) return toast.error("Enter a Calendly link");
+    localStorage.setItem("outrix.calendly", calendly.trim());
+    toast.success("Calendly link saved");
+  };
+
+  const linkedinConnected = !!profile?.linkedin_connected;
 
   return (
     <div>
@@ -46,10 +82,8 @@ function Integrations() {
                 <Button
                   size="sm"
                   variant={linkedinConnected ? "outline" : "default"}
-                  onClick={() => {
-                    setLinkedinConnected(!linkedinConnected);
-                    toast.success(linkedinConnected ? "LinkedIn disconnected" : "LinkedIn connected");
-                  }}
+                  onClick={() => linkedin.mutate(!linkedinConnected)}
+                  disabled={linkedin.isPending || (!linkedinConnected && !linkedinUrl.trim())}
                   className={
                     linkedinConnected
                       ? "h-8 rounded-xl border-border/70 text-[12px]"
@@ -58,8 +92,15 @@ function Integrations() {
                 >
                   {linkedinConnected ? "Disconnect" : "Connect LinkedIn"}
                 </Button>
+                <Input
+                  value={linkedinUrl}
+                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/in/your-profile"
+                  className="h-8 max-w-xs rounded-xl text-[12px]"
+                  aria-label="LinkedIn profile URL"
+                />
                 <span className="text-[11.5px] text-muted-foreground">
-                  Signed in as Asad Farooq
+                  {profile?.full_name || profile?.email || "Signed in"}
                 </span>
               </div>
             </div>
@@ -94,7 +135,7 @@ function Integrations() {
                   />
                   <Button
                     size="sm"
-                    onClick={() => toast.success("Calendly link saved")}
+                    onClick={saveCalendly}
                     className="h-9 rounded-lg bg-black text-[12px] text-white hover:bg-neutral-800"
                   >
                     Save
