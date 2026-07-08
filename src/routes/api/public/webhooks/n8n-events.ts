@@ -73,7 +73,7 @@ export const Route = createFileRoute("/api/public/webhooks/n8n-events")({
               .from("conversations").select("id").eq("lead_id", lead_id).maybeSingle();
             if (!existing) {
               await supabaseAdmin.from("conversations").insert({
-                user_id, lead_id, status: "open",
+                user_id, lead_id, unread: true, last_message_at: new Date().toISOString(),
               });
             }
           }
