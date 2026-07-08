@@ -25,7 +25,7 @@ const groups = [
     label: "Setup",
     items: [
       { title: "Profile", url: "/profile", icon: User },
-      { title: "AI Sales Brain", url: "/brain", icon: Brain },
+      
       { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
     ],
   },
