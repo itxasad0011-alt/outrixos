@@ -36,20 +36,39 @@ export const analyzeProfile = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const prompt = `Analyze this professional's LinkedIn profile and extract sales-relevant intelligence.
+    const prompt = `Analyze this professional's LinkedIn profile and extract deep sales-relevant intelligence.
 
 Name: ${data.full_name ?? "Unknown"}
 Headline: ${data.headline ?? ""}
 About: ${data.about ?? ""}
 URL: ${data.linkedin_url ?? ""}
 
-Return JSON with fields:
+Return ONLY valid JSON with fields:
 {
   "industry": "primary industry, 2-4 words",
   "services": ["service 1", "service 2", "service 3"],
   "target_audience": "one sentence describing ideal customer",
   "value_proposition": "one clear sentence, first person",
-  "experience_years": <integer estimate>
+  "experience_years": <integer estimate>,
+  "skills": ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5"],
+  "niche": "specific niche, 3-6 words",
+  "offers": ["offer 1", "offer 2"],
+  "positioning": "one-sentence market positioning",
+  "communication_style": "how this person communicates (e.g. direct, story-driven, data-driven)",
+  "outreach_tone": "one of: professional, founder, friendly, consultant, expert",
+  "expertise": ["expertise area 1", "expertise area 2", "expertise area 3"],
+  "company_summary": "2-3 sentence summary of the company/business",
+  "personal_brand_summary": "2-3 sentence personal brand summary",
+  "icp": {
+    "roles": ["target job titles"],
+    "industries": ["target industries"],
+    "company_size": "e.g. 10-200",
+    "signals": ["buying signals to look for"]
+  },
+  "messaging_strategy": "3-5 sentences on how to approach prospects",
+  "conversation_rules": "bullet list as single string, one rule per line",
+  "reply_strategy": "how to handle replies, objections, pricing (push meeting)",
+  "followup_logic": "cadence: FU1 after 3d, FU2 after 5d, FU3 after 7d, final after 10d"
 }`;
 
     const result = await callJson<{
@@ -58,11 +77,25 @@ Return JSON with fields:
       target_audience: string;
       value_proposition: string;
       experience_years: number;
+      skills: string[];
+      niche: string;
+      offers: string[];
+      positioning: string;
+      communication_style: string;
+      outreach_tone: string;
+      expertise: string[];
+      company_summary: string;
+      personal_brand_summary: string;
+      icp: Record<string, unknown>;
+      messaging_strategy: string;
+      conversation_rules: string;
+      reply_strategy: string;
+      followup_logic: string;
     }>(prompt);
 
     if (!result) throw new Error("AI could not analyze the profile. Try again.");
 
-    const patch = {
+    const profilePatch = {
       linkedin_url: data.linkedin_url ?? null,
       full_name: data.full_name ?? null,
       headline: data.headline ?? null,
@@ -72,21 +105,66 @@ Return JSON with fields:
       target_audience: result.target_audience,
       value_proposition: result.value_proposition,
       experience_years: result.experience_years ?? null,
+      skills: result.skills ?? null,
       linkedin_connected: true,
     };
+    const { error: pErr } = await supabase.from("profiles").update(profilePatch).eq("id", userId);
+    if (pErr) throw pErr;
 
-    const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
-    if (error) throw error;
+    const brainUpsert = {
+      user_id: userId,
+      tone: result.outreach_tone || "professional",
+      messaging_strategy: result.messaging_strategy,
+      icp: result.icp as never,
+      conversation_rules: result.conversation_rules,
+      reply_strategy: result.reply_strategy,
+      followup_logic: result.followup_logic,
+      positioning: result.positioning,
+      communication_style: result.communication_style,
+      outreach_tone: result.outreach_tone,
+      expertise: result.expertise,
+      skills: result.skills,
+      offers: result.offers,
+      niche: result.niche,
+      company_summary: result.company_summary,
+      personal_brand_summary: result.personal_brand_summary,
+      generated_at: new Date().toISOString(),
+    };
+    const { error: bErr } = await supabase
+      .from("sales_brain").upsert(brainUpsert, { onConflict: "user_id" });
+    if (bErr) throw bErr;
+
+    await supabase.from("profiles").update({ onboarding_complete: true }).eq("id", userId);
 
     await supabase.from("activity_log").insert({
       user_id: userId,
       kind: "system",
       title: "LinkedIn profile analyzed",
-      detail: `Extracted ICP · ${result.industry}`,
+      detail: `AI Sales Brain built · ${result.industry}`,
     });
 
-    return { ok: true, ...patch };
+    return { ok: true };
   });
+
+const PersonalDetailsInput = z.object({
+  full_name: z.string().optional(),
+  headline: z.string().optional(),
+  about: z.string().optional(),
+  gender: z.string().optional(),
+  country: z.string().optional(),
+  timezone: z.string().optional(),
+  language: z.string().optional(),
+});
+
+export const savePersonalDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => PersonalDetailsInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("profiles").update(data).eq("id", context.userId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 
 // ---------- 2. Generate Sales Brain ----------
 export const generateSalesBrain = createServerFn({ method: "POST" })
