@@ -188,7 +188,7 @@ function Dashboard() {
         actions={
           <>
             <Button asChild variant="outline" className="h-9 rounded-lg"><Link to="/discovery"><Search className="mr-1.5 h-3.5 w-3.5" />Discover leads</Link></Button>
-            <Button asChild className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"><Link to="/brain"><Zap className="mr-1.5 h-3.5 w-3.5" />Sales Brain</Link></Button>
+            <Button asChild className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"><Link to="/profile" search={{ tab: "brain" }}><Zap className="mr-1.5 h-3.5 w-3.5" />Sales Brain</Link></Button>
           </>
         }
       />
