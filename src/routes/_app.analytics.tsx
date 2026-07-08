@@ -9,6 +9,14 @@ import {
 import { Filter } from "lucide-react";
 
 export const Route = createFileRoute("/_app/analytics")({
+  head: () => ({
+    meta: [
+      { title: "Analytics — Outrix" },
+      { name: "description", content: "Outreach performance analytics: reply rates, meeting conversion, campaign funnels, and AI-driven recommendations to improve." },
+      { property: "og:title", content: "Analytics — Outrix" },
+      { property: "og:description", content: "Reply rates, meeting conversion, and AI-driven recommendations across your campaigns." },
+    ],
+  }),
   component: Analytics,
 });
 
