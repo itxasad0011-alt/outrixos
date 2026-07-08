@@ -107,8 +107,13 @@ function useViewPref() {
 function LeadsPage() {
   const qc = useQueryClient();
   const [view, setView] = useViewPref();
-  const [search, setSearch] = useState("");
-  const [debounced, setDebounced] = useState("");
+  const [search, setSearch] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const pending = localStorage.getItem("leads.globalSearch") ?? "";
+    localStorage.removeItem("leads.globalSearch");
+    return pending;
+  });
+  const [debounced, setDebounced] = useState(search);
   useEffect(() => { const t = setTimeout(() => setDebounced(search), 300); return () => clearTimeout(t); }, [search]);
 
   const [filters, setFilters] = useState<{
@@ -161,6 +166,21 @@ function LeadsPage() {
     if (next.has(id)) next.delete(id); else next.add(id);
     setSelected(next);
   }
+
+  function openAndSelectLead(lead: any) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.add(lead.id);
+      return next;
+    });
+    setOpenLead(lead);
+  }
+
+  useEffect(() => {
+    if (!openLead) return;
+    const fresh = rows.find((r: any) => r.id === openLead.id);
+    if (fresh && fresh !== openLead) setOpenLead(fresh);
+  }, [rows, openLead]);
 
   function exportCsv() {
     const cols = ["full_name", "role", "job_title", "company", "industry", "country", "location", "company_size", "email", "linkedin_url", "source", "status", "icp_score", "tags", "created_at"];
@@ -299,12 +319,12 @@ function LeadsPage() {
                 lead={l}
                 selected={selected.has(l.id)}
                 onToggle={() => toggleOne(l.id)}
-                onOpen={() => setOpenLead(l)}
+                onOpen={() => openAndSelectLead(l)}
               />
             ))}
           </div>
         ) : (
-          <LeadsTable rows={rows} selected={selected} allSelected={allSelected} toggleAll={toggleAll} toggleOne={toggleOne} onOpen={setOpenLead} />
+          <LeadsTable rows={rows} selected={selected} allSelected={allSelected} toggleAll={toggleAll} toggleOne={toggleOne} onOpen={openAndSelectLead} />
         )}
 
         {/* Pagination */}
