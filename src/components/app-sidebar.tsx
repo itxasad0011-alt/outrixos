@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, User, Brain, BookOpen, Users2, Send,
-  MessagesSquare, Repeat, Sparkles, Calendar, Trophy, XCircle,
-  BarChart3, Database, Plug, CreditCard, Bell, LogOut, Settings, Keyboard, LifeBuoy, ChevronsUpDown,
+  MessagesSquare, Repeat, Sparkles, Calendar, XCircle,
+  BarChart3, Database, Plug, Bell, LogOut, Settings, Keyboard, LifeBuoy, ChevronsUpDown,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -48,7 +48,6 @@ const groups = [
     items: [
       { title: "Interested", url: "/interested", icon: Sparkles },
       { title: "Meetings", url: "/meetings", icon: Calendar },
-      { title: "Warm Clients", url: "/won", icon: Trophy },
       { title: "Not Interested", url: "/not-interested", icon: XCircle },
     ],
   },
@@ -63,7 +62,7 @@ const groups = [
     label: "Settings",
     items: [
       { title: "Integrations", url: "/integrations", icon: Plug },
-      { title: "Billing", url: "/billing", icon: CreditCard },
+      
       { title: "Notifications", url: "/notifications", icon: Bell },
     ],
   },
@@ -177,9 +176,6 @@ export function AppSidebar() {
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="rounded-lg text-[13px]">
               <Link to="/integrations"><Settings className="mr-2 h-4 w-4" /> Workspace Settings</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="rounded-lg text-[13px]">
-              <Link to="/billing"><CreditCard className="mr-2 h-4 w-4" /> Subscription & Billing</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="rounded-lg text-[13px]">
               <Link to="/notifications"><Bell className="mr-2 h-4 w-4" /> Notifications</Link>

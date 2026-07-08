@@ -22,7 +22,6 @@ const PIPELINE: { key: string; label: string; statuses: string[] }[] = [
   { key: "conversation", label: "Conversation", statuses: ["messaged", "replied"] },
   { key: "interested", label: "Interested", statuses: ["interested"] },
   { key: "meeting", label: "Meeting Booked", statuses: ["meeting"] },
-  { key: "warm", label: "Warm Client", statuses: ["warm"] },
   { key: "won", label: "Won Client", statuses: ["won"] },
 ];
 
@@ -48,9 +47,9 @@ function Dashboard() {
         yLeads, yConvos, yMeetings,
       ] = await Promise.all([
         supabase.from("leads").select("id", { count: "exact", head: true }),
-        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["messaged", "replied", "interested", "meeting", "won", "warm"]),
-        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["replied", "interested", "meeting", "won", "warm"]),
-        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["interested", "meeting", "won", "warm"]),
+        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["messaged", "replied", "interested", "meeting", "won"]),
+        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["replied", "interested", "meeting", "won"]),
+        supabase.from("leads").select("id", { count: "exact", head: true }).in("status", ["interested", "meeting", "won"]),
         supabase.from("meetings").select("id", { count: "exact", head: true }),
         supabase.from("activity_log").select("*").order("created_at", { ascending: false }).limit(5),
         supabase.from("leads").select("status"),
