@@ -34,7 +34,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/outreach")({ component: OutreachCampaigns });
+export const Route = createFileRoute("/_app/outreach")({
+  head: () => ({
+    meta: [
+      { title: "Campaigns — Outrix" },
+      { name: "description", content: "Build, launch, and monitor multi-step LinkedIn outreach campaigns with AI personalization, sequencing, and live performance analytics." },
+      { property: "og:title", content: "Campaigns — Outrix" },
+      { property: "og:description", content: "Multi-step LinkedIn outreach campaigns with AI personalization and live analytics." },
+    ],
+  }),
+  component: OutreachCampaigns,
+});
 
 const DAYS = [
   { v: "mon", l: "Mon" }, { v: "tue", l: "Tue" }, { v: "wed", l: "Wed" },
