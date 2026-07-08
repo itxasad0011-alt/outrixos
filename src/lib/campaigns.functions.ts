@@ -165,13 +165,13 @@ async function buildBrainContext(supabase: any, userId: string): Promise<string>
   ]);
   const parts: string[] = [];
   if (brain) {
-    if (brain.company_name) parts.push(`Company: ${brain.company_name}`);
-    if (brain.value_prop) parts.push(`Value proposition: ${brain.value_prop}`);
-    if (brain.target_audience) parts.push(`Target audience: ${brain.target_audience}`);
+    if (brain.icp) parts.push(`Ideal customer profile: ${JSON.stringify(brain.icp)}`);
+    if (brain.messaging_strategy) parts.push(`Messaging strategy: ${JSON.stringify(brain.messaging_strategy)}`);
     if (brain.tone) parts.push(`Tone: ${brain.tone}`);
-    if (brain.dos) parts.push(`Do's: ${brain.dos}`);
-    if (brain.donts) parts.push(`Don'ts: ${brain.donts}`);
+    if (brain.dos) parts.push(`Do's: ${JSON.stringify(brain.dos)}`);
+    if (brain.donts) parts.push(`Don'ts: ${JSON.stringify(brain.donts)}`);
     if (brain.custom_instructions) parts.push(`Custom instructions: ${brain.custom_instructions}`);
+    if (brain.website) parts.push(`Website: ${brain.website}`);
   }
   if (docs?.length) parts.push(`Knowledge:\n${docs.map((d: any) => `- ${d.title}: ${d.summary ?? ""}`).join("\n")}`);
   return parts.join("\n");
