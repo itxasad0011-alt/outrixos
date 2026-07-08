@@ -1153,7 +1153,7 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
         </div>
         <DialogFooter className="border-t border-border/60 bg-secondary/30 px-6 py-4">
           <Button variant="ghost" className="rounded-lg" onClick={onClose}>Cancel</Button>
-          <Button className="rounded-lg" onClick={() => m.mutate()} disabled={m.isPending || selected.size === 0}>
+          <Button className="rounded-lg" onClick={() => m.mutate(undefined)} disabled={m.isPending || selected.size === 0}>
             {m.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null} Add selected ({selected.size})
           </Button>
         </DialogFooter>
