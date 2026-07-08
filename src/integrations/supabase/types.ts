@@ -256,12 +256,14 @@ export type Database = {
           created_at: string
           daily_limit: number
           description: string | null
+          favorite: boolean
           id: string
           last_activity_at: string | null
           launched_at: string | null
           name: string
           sender_account: string | null
           status: string
+          tags: string[]
           timezone: string
           updated_at: string
           user_id: string
@@ -273,12 +275,14 @@ export type Database = {
           created_at?: string
           daily_limit?: number
           description?: string | null
+          favorite?: boolean
           id?: string
           last_activity_at?: string | null
           launched_at?: string | null
           name: string
           sender_account?: string | null
           status?: string
+          tags?: string[]
           timezone?: string
           updated_at?: string
           user_id: string
@@ -290,12 +294,14 @@ export type Database = {
           created_at?: string
           daily_limit?: number
           description?: string | null
+          favorite?: boolean
           id?: string
           last_activity_at?: string | null
           launched_at?: string | null
           name?: string
           sender_account?: string | null
           status?: string
+          tags?: string[]
           timezone?: string
           updated_at?: string
           user_id?: string

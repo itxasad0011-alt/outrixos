@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  listCampaigns, createCampaign, updateCampaignStatus,
+  listCampaigns, createCampaign, updateCampaignStatus, updateCampaign,
   deleteCampaign, duplicateCampaign,
 } from "@/lib/campaigns.functions";
 import { PageHeader } from "@/components/page-header";
@@ -12,9 +12,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -24,7 +29,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  Plus, Search, MoreHorizontal, Play, Pause, Copy, Trash2, Archive, Loader2, Users, Send,
+  Plus, Search, MoreHorizontal, Play, Pause, Copy, Trash2, Archive, Loader2, Send,
+  Star, Pencil, Settings, Download, ExternalLink, ChevronDown, Circle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,42 +41,80 @@ const DAYS = [
   { v: "thu", l: "Thu" }, { v: "fri", l: "Fri" }, { v: "sat", l: "Sat" }, { v: "sun", l: "Sun" },
 ];
 
+type Campaign = {
+  id: string; name: string; description?: string | null; status: string;
+  sender_account?: string | null; daily_limit: number;
+  working_days: string[]; working_hours_start: string; working_hours_end: string;
+  timezone: string; tags: string[]; favorite: boolean;
+  created_at: string; last_activity_at?: string | null;
+  total_leads: number; completed_leads: number; replied_leads: number;
+};
+
 function OutreachCampaigns() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const list = useServerFn(listCampaigns);
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ["campaigns"],
-    queryFn: () => list({}),
+    queryFn: () => list({}) as Promise<Campaign[]>,
   });
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("all");
-  const [sort, setSort] = useState<string>("newest");
-  const [open, setOpen] = useState(false);
+  const [sender, setSender] = useState<string>("all");
+  const [tag, setTag] = useState<string>("all");
+  const [favOnly, setFavOnly] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    let r = campaigns.filter((c: any) =>
-      (status === "all" || c.status === status) &&
-      (query.trim() === "" || c.name.toLowerCase().includes(query.toLowerCase())),
-    );
-    if (sort === "oldest") r = [...r].sort((a: any, b: any) => a.created_at.localeCompare(b.created_at));
-    if (sort === "most_leads") r = [...r].sort((a: any, b: any) => b.total_leads - a.total_leads);
-    if (sort === "reply_rate") r = [...r].sort((a: any, b: any) => (b.replied_leads / Math.max(b.total_leads, 1)) - (a.replied_leads / Math.max(a.total_leads, 1)));
-    return r;
-  }, [campaigns, query, status, sort]);
+  const senders = useMemo(
+    () => Array.from(new Set(campaigns.map((c) => c.sender_account).filter(Boolean))) as string[],
+    [campaigns],
+  );
+  const allTags = useMemo(
+    () => Array.from(new Set(campaigns.flatMap((c) => c.tags ?? []))),
+    [campaigns],
+  );
+
+  const filtered = useMemo(() => campaigns.filter((c) =>
+    (status === "all" || c.status === status) &&
+    (sender === "all" || c.sender_account === sender) &&
+    (tag === "all" || (c.tags ?? []).includes(tag)) &&
+    (!favOnly || c.favorite) &&
+    (query.trim() === "" || c.name.toLowerCase().includes(query.toLowerCase())),
+  ), [campaigns, query, status, sender, tag, favOnly]);
+
+  const onRowClick = (id: string) => navigate({ to: "/outreach/$campaignId", params: { campaignId: id } });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["campaigns"] });
 
   return (
     <div>
       <PageHeader
-        title="Outreach"
-        description="Manage LinkedIn campaigns. Import leads, design a sequence, launch when ready."
+        title="Campaigns"
+        description="Manage every LinkedIn outreach campaign in one place."
         actions={
-          <Button
-            onClick={() => setOpen(true)}
-            className="h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
-          >
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Create campaign
-          </Button>
+          <div className="flex items-center">
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="h-9 rounded-l-lg rounded-r-none bg-[#0A0A0A] pr-3 hover:bg-[#262626]"
+            >
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> Create campaign
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="h-9 rounded-l-none rounded-r-lg border-l border-white/10 bg-[#0A0A0A] px-2 hover:bg-[#262626]">
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-xl">
+                <DropdownMenuItem onSelect={() => setCreateOpen(true)}>
+                  <Plus className="mr-2 h-3.5 w-3.5" /> Blank campaign
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  <Copy className="mr-2 h-3.5 w-3.5" /> From template (soon)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
       <div className="px-8 py-6 space-y-5">
@@ -85,9 +129,7 @@ function OutreachCampaigns() {
             />
           </div>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="h-9 w-[150px] rounded-xl bg-white text-[13px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
+            <SelectTrigger className="h-9 w-[140px] rounded-xl bg-white text-[13px]"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
@@ -97,45 +139,76 @@ function OutreachCampaigns() {
               <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="h-9 w-[170px] rounded-xl bg-white text-[13px]">
-              <SelectValue />
-            </SelectTrigger>
+          <Select value={sender} onValueChange={setSender}>
+            <SelectTrigger className="h-9 w-[160px] rounded-xl bg-white text-[13px]"><SelectValue placeholder="Sender" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="oldest">Oldest</SelectItem>
-              <SelectItem value="most_leads">Most leads</SelectItem>
-              <SelectItem value="reply_rate">Highest reply rate</SelectItem>
+              <SelectItem value="all">All senders</SelectItem>
+              {senders.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Select value={tag} onValueChange={setTag}>
+            <SelectTrigger className="h-9 w-[140px] rounded-xl bg-white text-[13px]"><SelectValue placeholder="Tags" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All tags</SelectItem>
+              {allTags.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value="me">
+            <SelectTrigger className="h-9 w-[140px] rounded-xl bg-white text-[13px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="me">Created by me</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="ml-auto flex items-center gap-2 rounded-xl border border-border/70 bg-white px-3 py-1.5">
+            <Star className={`h-3.5 w-3.5 ${favOnly ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+            <span className="text-[12.5px] text-foreground">Favorites only</span>
+            <Switch checked={favOnly} onCheckedChange={setFavOnly} />
+          </div>
         </div>
 
         {isLoading ? (
-          <div className="grid place-items-center py-24 text-[13px] text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </div>
+          <div className="grid place-items-center py-24"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
         ) : filtered.length === 0 ? (
-          <EmptyState onCreate={() => setOpen(true)} />
+          <EmptyState onCreate={() => setCreateOpen(true)} />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((c: any) => (
-              <CampaignCard
-                key={c.id}
-                campaign={c}
-                onChanged={() => qc.invalidateQueries({ queryKey: ["campaigns"] })}
-              />
-            ))}
-          </div>
+          <Card className="overflow-hidden rounded-2xl border-border/70 bg-white">
+            <div className="overflow-x-auto">
+              <table className="w-full text-[13px]">
+                <thead>
+                  <tr className="border-b border-border/70 bg-neutral-50/50 text-[11.5px] uppercase tracking-wide text-muted-foreground">
+                    <Th className="w-10"></Th>
+                    <Th className="w-32">Status</Th>
+                    <Th>Campaign</Th>
+                    <Th className="w-56">Progress</Th>
+                    <Th className="w-48">Sender</Th>
+                    <Th className="w-48">Tags</Th>
+                    <Th className="w-32">Created</Th>
+                    <Th className="w-10"></Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((c) => (
+                    <CampaignRow
+                      key={c.id}
+                      c={c}
+                      onOpen={() => onRowClick(c.id)}
+                      onChanged={invalidate}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         )}
       </div>
 
-      <CreateCampaignDialog
-        open={open}
-        onOpenChange={setOpen}
-        onCreated={() => qc.invalidateQueries({ queryKey: ["campaigns"] })}
-      />
+      <CreateCampaignDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={invalidate} />
     </div>
   );
+}
+
+function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+  return <th className={`px-4 py-2.5 text-left font-medium ${className}`}>{children}</th>;
 }
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
@@ -147,9 +220,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
         </div>
         <div>
           <div className="text-[15px] font-semibold tracking-tight">No campaigns yet</div>
-          <div className="mt-1 text-[12.5px] text-muted-foreground">
-            Create your first LinkedIn campaign to start reaching out.
-          </div>
+          <div className="mt-1 text-[12.5px] text-muted-foreground">Create your first LinkedIn campaign to start reaching out.</div>
         </div>
         <Button onClick={onCreate} className="mt-2 h-9 rounded-lg bg-[#0A0A0A] hover:bg-[#262626]">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create campaign
@@ -159,107 +230,262 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   );
 }
 
-function statusColor(s: string) {
-  switch (s) {
-    case "running": return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "paused": return "bg-amber-50 text-amber-700 border-amber-200";
-    case "completed": return "bg-neutral-100 text-neutral-700 border-neutral-200";
-    case "archived": return "bg-neutral-50 text-neutral-500 border-neutral-200";
-    default: return "bg-white text-neutral-600 border-neutral-200";
-  }
+function StatusPill({ status }: { status: string }) {
+  const map: Record<string, { dot: string; text: string; bg: string; label: string }> = {
+    running:   { dot: "text-emerald-500", text: "text-emerald-700",  bg: "bg-emerald-50 border-emerald-100",  label: "Running" },
+    paused:    { dot: "text-amber-500",   text: "text-amber-700",    bg: "bg-amber-50 border-amber-100",      label: "Paused" },
+    draft:     { dot: "text-neutral-400", text: "text-neutral-700",  bg: "bg-neutral-50 border-neutral-200",  label: "Draft" },
+    completed: { dot: "text-blue-500",    text: "text-blue-700",     bg: "bg-blue-50 border-blue-100",        label: "Completed" },
+    archived:  { dot: "text-neutral-400", text: "text-neutral-500",  bg: "bg-neutral-50 border-neutral-200",  label: "Archived" },
+  };
+  const s = map[status] ?? map.draft;
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11.5px] font-medium ${s.bg} ${s.text}`}>
+      <Circle className={`h-2 w-2 fill-current ${s.dot}`} />
+      {s.label}
+    </span>
+  );
 }
 
-function CampaignCard({ campaign: c, onChanged }: { campaign: any; onChanged: () => void }) {
-  const setStatus = useServerFn(updateCampaignStatus);
-  const del = useServerFn(deleteCampaign);
-  const dup = useServerFn(duplicateCampaign);
+function CampaignRow({ c, onOpen, onChanged }: { c: Campaign; onOpen: () => void; onChanged: () => void }) {
+  const setStatusFn = useServerFn(updateCampaignStatus);
+  const updateFn = useServerFn(updateCampaign);
+  const delFn = useServerFn(deleteCampaign);
+  const dupFn = useServerFn(duplicateCampaign);
 
-  const setM = useMutation({
-    mutationFn: (status: any) => setStatus({ data: { id: c.id, status } }),
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const statusM = useMutation({
+    mutationFn: (status: any) => setStatusFn({ data: { id: c.id, status } }),
     onSuccess: () => { toast.success("Updated"); onChanged(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-  const delM = useMutation({
-    mutationFn: () => del({ data: { id: c.id } }),
-    onSuccess: () => { toast.success("Deleted"); onChanged(); },
+  const favM = useMutation({
+    mutationFn: () => updateFn({ data: { id: c.id, favorite: !c.favorite } }),
+    onSuccess: onChanged,
   });
   const dupM = useMutation({
-    mutationFn: () => dup({ data: { id: c.id } }),
-    onSuccess: () => { toast.success("Duplicated"); onChanged(); },
+    mutationFn: () => dupFn({ data: { id: c.id } }),
+    onSuccess: () => { toast.success("Campaign duplicated"); onChanged(); },
+  });
+  const delM = useMutation({
+    mutationFn: () => delFn({ data: { id: c.id } }),
+    onSuccess: () => { toast.success("Campaign deleted"); onChanged(); },
   });
 
   const pct = c.total_leads ? Math.round((c.completed_leads / c.total_leads) * 100) : 0;
 
+  function exportCampaign() {
+    const payload = {
+      id: c.id, name: c.name, description: c.description, status: c.status,
+      sender_account: c.sender_account, daily_limit: c.daily_limit,
+      working_days: c.working_days, working_hours_start: c.working_hours_start,
+      working_hours_end: c.working_hours_end, timezone: c.timezone,
+      tags: c.tags, created_at: c.created_at,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${c.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+
   return (
-    <Card className="rounded-2xl border-border/70 bg-white transition-shadow hover:shadow-sm">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <Link
-              to="/outreach/$campaignId"
-              params={{ campaignId: c.id }}
-              className="block truncate text-[14.5px] font-semibold tracking-tight hover:underline"
-            >
-              {c.name}
-            </Link>
-            {c.description && (
-              <div className="mt-0.5 line-clamp-1 text-[12px] text-muted-foreground">{c.description}</div>
-            )}
+    <>
+      <tr
+        onClick={onOpen}
+        className="group cursor-pointer border-b border-border/60 transition-colors hover:bg-neutral-50/70"
+      >
+        <td className="px-4 py-3" onClick={stop}>
+          <button
+            onClick={() => favM.mutate()}
+            className="grid h-7 w-7 place-items-center rounded-lg hover:bg-neutral-100"
+            aria-label={c.favorite ? "Unfavorite" : "Favorite"}
+          >
+            <Star className={`h-3.5 w-3.5 ${c.favorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+          </button>
+        </td>
+        <td className="px-4 py-3"><StatusPill status={c.status} /></td>
+        <td className="px-4 py-3">
+          <div className="truncate font-medium text-foreground">{c.name}</div>
+          {c.description && <div className="truncate text-[11.5px] text-muted-foreground">{c.description}</div>}
+        </td>
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="tabular-nums text-[12px] text-foreground">{c.completed_leads}/{c.total_leads}</span>
+            <Progress value={pct} className="h-1.5 flex-1" />
+            <span className="tabular-nums text-[11px] text-muted-foreground w-8 text-right">{pct}%</span>
           </div>
+        </td>
+        <td className="px-4 py-3">
+          {c.sender_account ? (
+            <div className="flex items-center gap-2">
+              <div className="grid h-6 w-6 place-items-center rounded-full bg-neutral-900 text-[10px] font-semibold text-white">
+                {c.sender_account.slice(0, 2).toUpperCase()}
+              </div>
+              <span className="truncate text-[12.5px] text-foreground">{c.sender_account}</span>
+            </div>
+          ) : <span className="text-[12px] text-muted-foreground">—</span>}
+        </td>
+        <td className="px-4 py-3">
+          <div className="flex flex-wrap gap-1">
+            {(c.tags ?? []).slice(0, 3).map((t) => (
+              <Badge key={t} variant="outline" className="h-5 rounded-md border-border/70 bg-neutral-50 px-1.5 text-[10.5px] font-medium">{t}</Badge>
+            ))}
+            {(c.tags?.length ?? 0) === 0 && <span className="text-[12px] text-muted-foreground">—</span>}
+            {(c.tags?.length ?? 0) > 3 && <span className="text-[11px] text-muted-foreground">+{c.tags.length - 3}</span>}
+          </div>
+        </td>
+        <td className="px-4 py-3 text-[12px] text-muted-foreground tabular-nums">
+          {new Date(c.created_at).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}
+        </td>
+        <td className="px-4 py-3" onClick={stop}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg opacity-70 hover:opacity-100">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl">
-              <DropdownMenuItem asChild>
-                <Link to="/outreach/$campaignId" params={{ campaignId: c.id }}>Open</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => dupM.mutate()}><Copy className="mr-2 h-3.5 w-3.5" /> Duplicate</DropdownMenuItem>
-              {c.status === "running" ? (
-                <DropdownMenuItem onSelect={() => setM.mutate("paused")}><Pause className="mr-2 h-3.5 w-3.5" /> Pause</DropdownMenuItem>
-              ) : c.status === "paused" ? (
-                <DropdownMenuItem onSelect={() => setM.mutate("running")}><Play className="mr-2 h-3.5 w-3.5" /> Resume</DropdownMenuItem>
-              ) : null}
-              <DropdownMenuItem onSelect={() => setM.mutate("archived")}><Archive className="mr-2 h-3.5 w-3.5" /> Archive</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-52 rounded-xl">
+              <DropdownMenuItem onSelect={onOpen}><ExternalLink className="mr-2 h-3.5 w-3.5" /> Open campaign</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => dupM.mutate()}><Copy className="mr-2 h-3.5 w-3.5" /> Duplicate campaign</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setRenameOpen(true)}><Pencil className="mr-2 h-3.5 w-3.5" /> Rename campaign</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setSettingsOpen(true)}><Settings className="mr-2 h-3.5 w-3.5" /> Campaign settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => delM.mutate()} className="text-destructive focus:text-destructive">
-                <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
+              {c.status === "running" && (
+                <DropdownMenuItem onSelect={() => statusM.mutate("paused")}><Pause className="mr-2 h-3.5 w-3.5" /> Pause campaign</DropdownMenuItem>
+              )}
+              {c.status === "paused" && (
+                <DropdownMenuItem onSelect={() => statusM.mutate("running")}><Play className="mr-2 h-3.5 w-3.5" /> Resume campaign</DropdownMenuItem>
+              )}
+              <DropdownMenuItem onSelect={() => statusM.mutate("archived")}><Archive className="mr-2 h-3.5 w-3.5" /> Archive campaign</DropdownMenuItem>
+              <DropdownMenuItem onSelect={exportCampaign}><Download className="mr-2 h-3.5 w-3.5" /> Export campaign</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="text-destructive focus:text-destructive">
+                <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete campaign
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </td>
+      </tr>
 
-        <div className="mt-3 flex items-center gap-2">
-          <Badge variant="outline" className={`h-5 rounded-md border px-1.5 text-[10.5px] font-medium capitalize ${statusColor(c.status)}`}>
-            {c.status}
-          </Badge>
-          <div className="flex items-center gap-1 text-[11.5px] text-muted-foreground">
-            <Users className="h-3 w-3" /> {c.total_leads} leads
-          </div>
-          <div className="text-[11.5px] text-muted-foreground">· {c.daily_limit}/day</div>
-        </div>
-
-        <div className="mt-4">
-          <div className="mb-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
-            <span>Progress</span><span>{pct}%</span>
-          </div>
-          <Progress value={pct} className="h-1.5" />
-        </div>
-
-        <div className="mt-4 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>Created {new Date(c.created_at).toLocaleDateString()}</span>
-          {c.last_activity_at && <span>Active {new Date(c.last_activity_at).toLocaleDateString()}</span>}
-        </div>
-      </CardContent>
-    </Card>
+      <RenameDialog open={renameOpen} onOpenChange={setRenameOpen} campaign={c} onSaved={onChanged} />
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} campaign={c} onSaved={onChanged} />
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{c.name}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the campaign, sequence, leads and analytics. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => delM.mutate()} className="rounded-lg bg-destructive hover:bg-destructive/90">
+              Delete campaign
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
-function CreateCampaignDialog({
-  open, onOpenChange, onCreated,
-}: { open: boolean; onOpenChange: (o: boolean) => void; onCreated: () => void }) {
+function RenameDialog({ open, onOpenChange, campaign, onSaved }: {
+  open: boolean; onOpenChange: (o: boolean) => void; campaign: Campaign; onSaved: () => void;
+}) {
+  const updateFn = useServerFn(updateCampaign);
+  const [name, setName] = useState(campaign.name);
+  const m = useMutation({
+    mutationFn: () => updateFn({ data: { id: campaign.id, name: name.trim() } }),
+    onSuccess: () => { toast.success("Renamed"); onSaved(); onOpenChange(false); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="rounded-2xl sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Rename campaign</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-1.5">
+          <Label className="text-[12px]">Campaign name</Label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} className="h-9 rounded-lg" autoFocus />
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" className="rounded-lg" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button className="rounded-lg bg-[#0A0A0A] hover:bg-[#262626]" onClick={() => m.mutate()} disabled={m.isPending || !name.trim()}>
+            {m.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />} Save
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SettingsDialog({ open, onOpenChange, campaign, onSaved }: {
+  open: boolean; onOpenChange: (o: boolean) => void; campaign: Campaign; onSaved: () => void;
+}) {
+  const updateFn = useServerFn(updateCampaign);
+  const [form, setForm] = useState({
+    name: campaign.name,
+    description: campaign.description ?? "",
+    sender_account: campaign.sender_account ?? "",
+    daily_limit: campaign.daily_limit,
+    working_days: campaign.working_days,
+    working_hours_start: campaign.working_hours_start,
+    working_hours_end: campaign.working_hours_end,
+    timezone: campaign.timezone,
+    tags: (campaign.tags ?? []).join(", "),
+  });
+  const m = useMutation({
+    mutationFn: () => updateFn({ data: {
+      id: campaign.id,
+      name: form.name.trim(),
+      description: form.description || null,
+      sender_account: form.sender_account || null,
+      daily_limit: Number(form.daily_limit),
+      working_days: form.working_days,
+      working_hours_start: form.working_hours_start,
+      working_hours_end: form.working_hours_end,
+      timezone: form.timezone,
+      tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+    } }),
+    onSuccess: () => { toast.success("Campaign settings saved"); onSaved(); onOpenChange(false); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const toggleDay = (d: string) => setForm((f) => ({
+    ...f, working_days: f.working_days.includes(d) ? f.working_days.filter((x) => x !== d) : [...f.working_days, d],
+  }));
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="rounded-2xl sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Campaign settings</DialogTitle>
+          <DialogDescription>Update the basic configuration for this campaign.</DialogDescription>
+        </DialogHeader>
+        <CampaignForm form={form} setForm={setForm} toggleDay={toggleDay} showTags />
+        <DialogFooter>
+          <Button variant="ghost" className="rounded-lg" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button className="rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
+            onClick={() => m.mutate()}
+            disabled={m.isPending || !form.name.trim() || form.working_days.length === 0}>
+            {m.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />} Save changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function CreateCampaignDialog({ open, onOpenChange, onCreated }: {
+  open: boolean; onOpenChange: (o: boolean) => void; onCreated: () => void;
+}) {
   const create = useServerFn(createCampaign);
   const [form, setForm] = useState({
     name: "", description: "", sender_account: "",
@@ -267,9 +493,18 @@ function CreateCampaignDialog({
     working_days: ["mon", "tue", "wed", "thu", "fri"],
     working_hours_start: "09:00", working_hours_end: "17:00",
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+    tags: "",
   });
   const m = useMutation({
-    mutationFn: () => create({ data: form }),
+    mutationFn: () => create({ data: {
+      name: form.name.trim(), description: form.description || undefined,
+      sender_account: form.sender_account || undefined,
+      daily_limit: Number(form.daily_limit),
+      working_days: form.working_days,
+      working_hours_start: form.working_hours_start,
+      working_hours_end: form.working_hours_end,
+      timezone: form.timezone,
+    } }),
     onSuccess: () => {
       toast.success("Campaign created");
       onCreated();
@@ -278,14 +513,9 @@ function CreateCampaignDialog({
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-
-  function toggleDay(d: string) {
-    setForm((f) => ({
-      ...f,
-      working_days: f.working_days.includes(d) ? f.working_days.filter((x) => x !== d) : [...f.working_days, d],
-    }));
-  }
-
+  const toggleDay = (d: string) => setForm((f) => ({
+    ...f, working_days: f.working_days.includes(d) ? f.working_days.filter((x) => x !== d) : [...f.working_days, d],
+  }));
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="rounded-2xl sm:max-w-lg">
@@ -293,73 +523,87 @@ function CreateCampaignDialog({
           <DialogTitle>Create campaign</DialogTitle>
           <DialogDescription>Set the basics. You'll build the sequence and import leads next.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3.5">
-          <div className="space-y-1.5">
-            <Label className="text-[12px]">Campaign name</Label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-9 rounded-lg" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-[12px]">Description</Label>
-            <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="min-h-[64px] rounded-lg" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-[12px]">Sender LinkedIn account</Label>
-            <Input placeholder="you@company.com" value={form.sender_account} onChange={(e) => setForm({ ...form, sender_account: e.target.value })} className="h-9 rounded-lg" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[12px]">Daily connection limit</Label>
-              <Input type="number" min={1} max={200} value={form.daily_limit}
-                onChange={(e) => setForm({ ...form, daily_limit: Number(e.target.value) })}
-                className="h-9 rounded-lg" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[12px]">Timezone</Label>
-              <Input value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })} className="h-9 rounded-lg" />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-[12px]">Working days</Label>
-            <div className="flex flex-wrap gap-1.5">
-              {DAYS.map((d) => (
-                <button
-                  key={d.v}
-                  type="button"
-                  onClick={() => toggleDay(d.v)}
-                  className={`h-8 rounded-lg border px-2.5 text-[12px] transition-colors ${
-                    form.working_days.includes(d.v)
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-border/70 bg-white text-foreground hover:bg-neutral-50"
-                  }`}
-                >
-                  {d.l}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[12px]">Working hours start</Label>
-              <Input type="time" value={form.working_hours_start} onChange={(e) => setForm({ ...form, working_hours_start: e.target.value })} className="h-9 rounded-lg" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[12px]">Working hours end</Label>
-              <Input type="time" value={form.working_hours_end} onChange={(e) => setForm({ ...form, working_hours_end: e.target.value })} className="h-9 rounded-lg" />
-            </div>
-          </div>
-        </div>
+        <CampaignForm form={form} setForm={setForm} toggleDay={toggleDay} />
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-lg">Cancel</Button>
+          <Button variant="ghost" className="rounded-lg" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button
+            className="rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
             onClick={() => m.mutate()}
             disabled={m.isPending || !form.name.trim() || form.working_days.length === 0}
-            className="rounded-lg bg-[#0A0A0A] hover:bg-[#262626]"
           >
-            {m.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
-            Save campaign
+            {m.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />} Save campaign
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function CampaignForm({ form, setForm, toggleDay, showTags = false }: {
+  form: any; setForm: (updater: any) => void; toggleDay: (d: string) => void; showTags?: boolean;
+}) {
+  return (
+    <div className="space-y-3.5">
+      <div className="space-y-1.5">
+        <Label className="text-[12px]">Campaign name</Label>
+        <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-9 rounded-lg" />
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-[12px]">Description</Label>
+        <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="min-h-[64px] rounded-lg" />
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-[12px]">LinkedIn sender account</Label>
+        <Input placeholder="you@company.com" value={form.sender_account} onChange={(e) => setForm({ ...form, sender_account: e.target.value })} className="h-9 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label className="text-[12px]">Daily connection limit</Label>
+          <Input type="number" min={1} max={200} value={form.daily_limit}
+            onChange={(e) => setForm({ ...form, daily_limit: Number(e.target.value) })} className="h-9 rounded-lg" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-[12px]">Timezone</Label>
+          <Input value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })} className="h-9 rounded-lg" />
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-[12px]">Working days</Label>
+        <div className="flex flex-wrap gap-1.5">
+          {DAYS.map((d) => (
+            <button
+              key={d.v}
+              type="button"
+              onClick={() => toggleDay(d.v)}
+              className={`h-8 rounded-lg border px-2.5 text-[12px] transition-colors ${
+                form.working_days.includes(d.v)
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-border/70 bg-white text-foreground hover:bg-neutral-50"
+              }`}
+            >
+              {d.l}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label className="text-[12px]">Working hours start</Label>
+          <Input type="time" value={form.working_hours_start}
+            onChange={(e) => setForm({ ...form, working_hours_start: e.target.value })} className="h-9 rounded-lg" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-[12px]">Working hours end</Label>
+          <Input type="time" value={form.working_hours_end}
+            onChange={(e) => setForm({ ...form, working_hours_end: e.target.value })} className="h-9 rounded-lg" />
+        </div>
+      </div>
+      {showTags && (
+        <div className="space-y-1.5">
+          <Label className="text-[12px]">Tags <span className="text-muted-foreground">(comma separated)</span></Label>
+          <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className="h-9 rounded-lg" placeholder="q4-outbound, saas, founders" />
+        </div>
+      )}
+    </div>
   );
 }
