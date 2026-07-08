@@ -22,7 +22,6 @@ const PIPELINE: { key: string; label: string; statuses: string[] }[] = [
   { key: "conversation", label: "Conversation", statuses: ["messaged", "replied"] },
   { key: "interested", label: "Interested", statuses: ["interested"] },
   { key: "meeting", label: "Meeting Booked", statuses: ["meeting"] },
-  { key: "warm", label: "Warm Client", statuses: ["warm"] },
   { key: "won", label: "Won Client", statuses: ["won"] },
 ];
 
