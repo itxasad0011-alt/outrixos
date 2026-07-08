@@ -178,9 +178,6 @@ export function AppSidebar() {
               <Link to="/integrations"><Settings className="mr-2 h-4 w-4" /> Workspace Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="rounded-lg text-[13px]">
-              <Link to="/billing"><CreditCard className="mr-2 h-4 w-4" /> Subscription & Billing</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="rounded-lg text-[13px]">
               <Link to="/notifications"><Bell className="mr-2 h-4 w-4" /> Notifications</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
