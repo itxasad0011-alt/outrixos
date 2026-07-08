@@ -20,7 +20,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/knowledge")({ component: KbPage });
+export const Route = createFileRoute("/_app/knowledge")({
+  head: () => ({
+    meta: [
+      { title: "Knowledge Base — Outrix" },
+      { name: "description", content: "Feed your Outrix AI agent with case studies, FAQs, testimonials, and product notes so every message stays on-brand and accurate." },
+      { property: "og:title", content: "Knowledge Base — Outrix" },
+      { property: "og:description", content: "Case studies, FAQs, and product notes that ground your AI agent's outreach." },
+    ],
+  }),
+  component: KbPage,
+});
 
 const KINDS = [
   { id: "link", label: "Link", icon: LinkIcon, hint: "Add a webpage or article" },
