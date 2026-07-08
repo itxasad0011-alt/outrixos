@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -37,13 +37,36 @@ const groups = [
   },
 ];
 
+type NotificationPrefs = Record<string, { email: boolean; push: boolean }>;
+
+function defaultPrefs(): NotificationPrefs {
+  return Object.fromEntries(groups.flatMap((g) => g.items.map((it) => [it.t, { email: it.email, push: it.push }]))) as NotificationPrefs;
+}
+
 function Notifications() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [prefs, setPrefs] = useState<NotificationPrefs>(() => {
+    if (typeof window === "undefined") return defaultPrefs();
+    const saved = localStorage.getItem("outrix.notificationPrefs");
+    return saved ? { ...defaultPrefs(), ...JSON.parse(saved) } : defaultPrefs();
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("outrix.notificationPrefs");
+    if (saved) setPrefs({ ...defaultPrefs(), ...JSON.parse(saved) });
+  }, []);
+
+  function setPref(title: string, channel: "email" | "push", value: boolean) {
+    setPrefs((prev) => ({ ...prev, [title]: { ...prev[title], [channel]: value } }));
+    setDirty(true);
+  }
+
   const save = async () => {
     setSaving(true);
-    // Preferences are stored client-side until the backend endpoint is wired.
-    await new Promise((r) => setTimeout(r, 500));
+    localStorage.setItem("outrix.notificationPrefs", JSON.stringify(prefs));
+    await new Promise((r) => setTimeout(r, 200));
     setSaving(false);
     setDirty(false);
     toast.success("Notification preferences saved");
@@ -84,15 +107,15 @@ function Notifications() {
                       </div>
                       <div className="flex justify-center">
                         <Switch
-                          defaultChecked={it.email}
-                          onCheckedChange={() => setDirty(true)}
+                          checked={prefs[it.t]?.email ?? it.email}
+                          onCheckedChange={(v) => setPref(it.t, "email", v)}
                           aria-label={`${it.t} email notification`}
                         />
                       </div>
                       <div className="flex justify-center">
                         <Switch
-                          defaultChecked={it.push}
-                          onCheckedChange={() => setDirty(true)}
+                          checked={prefs[it.t]?.push ?? it.push}
+                          onCheckedChange={(v) => setPref(it.t, "push", v)}
                           aria-label={`${it.t} push notification`}
                         />
                       </div>
