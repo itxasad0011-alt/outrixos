@@ -27,7 +27,6 @@ import { Route as AppIntegrationsRouteImport } from './routes/_app.integrations'
 import { Route as AppFollowupsRouteImport } from './routes/_app.followups'
 import { Route as AppDiscoveryRouteImport } from './routes/_app.discovery'
 import { Route as AppConversationsRouteImport } from './routes/_app.conversations'
-import { Route as AppBrainRouteImport } from './routes/_app.brain'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
 import { Route as AppOutreachCampaignIdRouteImport } from './routes/_app.outreach.$campaignId'
 import { Route as ApiPublicWebhooksN8nEventsRouteImport } from './routes/api/public/webhooks/n8n-events'
@@ -122,11 +121,6 @@ const AppConversationsRoute = AppConversationsRouteImport.update({
   path: '/conversations',
   getParentRoute: () => AppRoute,
 } as any)
-const AppBrainRoute = AppBrainRouteImport.update({
-  id: '/brain',
-  path: '/brain',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -154,7 +148,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth': typeof AuthRoute
   '/analytics': typeof AppAnalyticsRoute
-  '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
   '/followups': typeof AppFollowupsRoute
@@ -177,7 +170,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/analytics': typeof AppAnalyticsRoute
-  '/brain': typeof AppBrainRoute
   '/conversations': typeof AppConversationsRoute
   '/discovery': typeof AppDiscoveryRoute
   '/followups': typeof AppFollowupsRoute
@@ -203,7 +195,6 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/analytics': typeof AppAnalyticsRoute
-  '/_app/brain': typeof AppBrainRoute
   '/_app/conversations': typeof AppConversationsRoute
   '/_app/discovery': typeof AppDiscoveryRoute
   '/_app/followups': typeof AppFollowupsRoute
@@ -230,7 +221,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/analytics'
-    | '/brain'
     | '/conversations'
     | '/discovery'
     | '/followups'
@@ -253,7 +243,6 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/analytics'
-    | '/brain'
     | '/conversations'
     | '/discovery'
     | '/followups'
@@ -278,7 +267,6 @@ export interface FileRouteTypes {
     | '/_app'
     | '/auth'
     | '/_app/analytics'
-    | '/_app/brain'
     | '/_app/conversations'
     | '/_app/discovery'
     | '/_app/followups'
@@ -435,13 +423,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConversationsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/brain': {
-      id: '/_app/brain'
-      path: '/brain'
-      fullPath: '/brain'
-      preLoaderRoute: typeof AppBrainRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/analytics': {
       id: '/_app/analytics'
       path: '/analytics'
@@ -487,7 +468,6 @@ const AppOutreachRouteWithChildren = AppOutreachRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
-  AppBrainRoute: typeof AppBrainRoute
   AppConversationsRoute: typeof AppConversationsRoute
   AppDiscoveryRoute: typeof AppDiscoveryRoute
   AppFollowupsRoute: typeof AppFollowupsRoute
@@ -508,7 +488,6 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
-  AppBrainRoute: AppBrainRoute,
   AppConversationsRoute: AppConversationsRoute,
   AppDiscoveryRoute: AppDiscoveryRoute,
   AppFollowupsRoute: AppFollowupsRoute,
