@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -59,6 +60,11 @@ type FollowUp = {
   conversation_id: string;
 };
 
+type ConversationOption = {
+  id: string;
+  lead: { full_name: string; company: string | null } | null;
+};
+
 const TABS = [
   { id: "all", label: "All" },
   { id: "scheduled", label: "Scheduled" },
@@ -76,8 +82,10 @@ function Followups() {
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("all");
   const [rescheduling, setRescheduling] = useState<FollowUp | null>(null);
   const [editing, setEditing] = useState<FollowUp | null>(null);
+  const [creating, setCreating] = useState(false);
   const [newDate, setNewDate] = useState("");
   const [editBody, setEditBody] = useState("");
+  const [createForm, setCreateForm] = useState({ conversation_id: "", step: 1, scheduled_at: "", body: "" });
 
   const { data, isLoading } = useQuery({
     queryKey: ["followups"],
@@ -88,6 +96,19 @@ function Followups() {
         .order("scheduled_at");
       if (error) throw error;
       return (data ?? []) as FollowUp[];
+    },
+  });
+
+  const { data: conversations = [] } = useQuery({
+    queryKey: ["followups.conversations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("id, lead:leads(full_name, company)")
+        .order("last_message_at", { ascending: false, nullsFirst: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as unknown as ConversationOption[];
     },
   });
 
@@ -119,6 +140,31 @@ function Followups() {
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["followups"] }),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Something went wrong"),
+  });
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("Sign in required");
+      if (!createForm.conversation_id) throw new Error("Select a conversation");
+      const scheduled = createForm.scheduled_at ? new Date(createForm.scheduled_at).toISOString() : new Date(Date.now() + 24 * 3600_000).toISOString();
+      const { error } = await supabase.from("follow_ups").insert({
+        user_id: auth.user.id,
+        conversation_id: createForm.conversation_id,
+        step: createForm.step,
+        scheduled_at: scheduled,
+        body: createForm.body.trim() || null,
+        status: "scheduled",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Follow-up created");
+      qc.invalidateQueries({ queryKey: ["followups"] });
+      setCreating(false);
+      setCreateForm({ conversation_id: "", step: 1, scheduled_at: "", body: "" });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   const sendNow = (f: FollowUp) =>
@@ -164,7 +210,7 @@ function Followups() {
         title="Follow-ups"
         description="A cadence control room for pending touches, AI-written messages, and reply-driving follow-up actions."
         actions={
-          <Button className="h-9 rounded-lg" onClick={() => toast.success("Follow-up creator ready")}> 
+          <Button className="h-9 rounded-lg" onClick={() => setCreating(true)}> 
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Follow-up
           </Button>
         }
@@ -220,7 +266,7 @@ function Followups() {
             {[0, 1, 2, 3].map((i) => <FollowupSkeleton key={i} />)}
           </div>
         ) : rows.length === 0 ? (
-          <EmptyState tab={tab} />
+          <EmptyState tab={tab} onCreate={() => setCreating(true)} />
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
             {rows.map((f) => (
@@ -280,6 +326,41 @@ function Followups() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={creating} onOpenChange={setCreating}>
+        <DialogContent className="rounded-2xl sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Create follow-up</DialogTitle>
+            <DialogDescription>Schedule a follow-up against an active conversation.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Select value={createForm.conversation_id} onValueChange={(v) => setCreateForm({ ...createForm, conversation_id: v })}>
+              <SelectTrigger className="h-10 rounded-xl"><SelectValue placeholder="Select conversation" /></SelectTrigger>
+              <SelectContent>
+                {conversations.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.lead?.full_name ?? "Unknown lead"}{c.lead?.company ? ` · ${c.lead.company}` : ""}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input type="number" min={1} max={9} value={createForm.step} onChange={(e) => setCreateForm({ ...createForm, step: Number(e.target.value) })} className="h-10 rounded-xl" aria-label="Follow-up number" />
+              <Input type="datetime-local" value={createForm.scheduled_at} onChange={(e) => setCreateForm({ ...createForm, scheduled_at: e.target.value })} className="h-10 rounded-xl" aria-label="Scheduled date and time" />
+            </div>
+            <textarea
+              value={createForm.body}
+              onChange={(e) => setCreateForm({ ...createForm, body: e.target.value })}
+              placeholder="Write the follow-up message…"
+              className="min-h-32 w-full rounded-2xl border border-border/70 bg-secondary/40 p-4 text-[13px] leading-relaxed outline-none focus:border-foreground"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="rounded-lg" onClick={() => setCreating(false)}>Cancel</Button>
+            <Button className="rounded-lg" onClick={() => create.mutate()} disabled={create.isPending || !createForm.conversation_id}>
+              {create.isPending ? "Creating…" : "Create follow-up"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -310,7 +391,7 @@ function FollowupSkeleton() {
   );
 }
 
-function EmptyState({ tab }: { tab: string }) {
+function EmptyState({ tab, onCreate }: { tab: string; onCreate: () => void }) {
   return (
     <Card className="rounded-2xl border-dashed border-border/70 bg-white shadow-sm shadow-black/[0.02]">
       <CardContent className="grid place-items-center gap-4 py-20 text-center">
@@ -324,7 +405,7 @@ function EmptyState({ tab }: { tab: string }) {
             {tab === "all" ? "When AI schedules cadence touches, they will appear here as reviewable workflow cards." : `No ${tab} follow-ups match this filter.`}
           </div>
         </div>
-        <Button className="h-10 rounded-xl" onClick={() => toast.success("Follow-up creator ready")}>
+        <Button className="h-10 rounded-xl" onClick={onCreate}>
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Follow-up
         </Button>
       </CardContent>
