@@ -97,6 +97,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "Outrix",
+              url: "https://outrixos.lovable.app",
+              logo: "https://outrixos.lovable.app/favicon.ico",
+              description: "AI sales agent for LinkedIn outreach, prospecting, and pipeline management.",
+            },
+            {
+              "@type": "WebSite",
+              name: "Outrix",
+              url: "https://outrixos.lovable.app",
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
