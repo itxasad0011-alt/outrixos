@@ -139,6 +139,172 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_events: {
+        Row: {
+          campaign_id: string
+          event_type: string
+          id: string
+          lead_id: string | null
+          occurred_at: string
+          payload: Json
+          step_id: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          event_type: string
+          id?: string
+          lead_id?: string | null
+          occurred_at?: string
+          payload?: Json
+          step_id?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          event_type?: string
+          id?: string
+          lead_id?: string | null
+          occurred_at?: string
+          payload?: Json
+          step_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_events_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_events_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "sequence_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_leads: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          current_step: number
+          id: string
+          last_activity_at: string | null
+          lead_id: string
+          next_action_at: string | null
+          paused: boolean
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          current_step?: number
+          id?: string
+          last_activity_at?: string | null
+          lead_id: string
+          next_action_at?: string | null
+          paused?: boolean
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          current_step?: number
+          id?: string
+          last_activity_at?: string | null
+          lead_id?: string
+          next_action_at?: string | null
+          paused?: boolean
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_leads_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_leads_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          created_at: string
+          daily_limit: number
+          description: string | null
+          id: string
+          last_activity_at: string | null
+          launched_at: string | null
+          name: string
+          sender_account: string | null
+          status: string
+          timezone: string
+          updated_at: string
+          user_id: string
+          working_days: string[]
+          working_hours_end: string
+          working_hours_start: string
+        }
+        Insert: {
+          created_at?: string
+          daily_limit?: number
+          description?: string | null
+          id?: string
+          last_activity_at?: string | null
+          launched_at?: string | null
+          name: string
+          sender_account?: string | null
+          status?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+          working_days?: string[]
+          working_hours_end?: string
+          working_hours_start?: string
+        }
+        Update: {
+          created_at?: string
+          daily_limit?: number
+          description?: string | null
+          id?: string
+          last_activity_at?: string | null
+          launched_at?: string | null
+          name?: string
+          sender_account?: string | null
+          status?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+          working_days?: string[]
+          working_hours_end?: string
+          working_hours_start?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           ai_summary: string | null
@@ -261,6 +427,8 @@ export type Database = {
         Row: {
           avatar_url: string | null
           company: string | null
+          company_size: string | null
+          country: string | null
           created_at: string
           full_name: string
           headline: string | null
@@ -279,6 +447,8 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           company?: string | null
+          company_size?: string | null
+          country?: string | null
           created_at?: string
           full_name: string
           headline?: string | null
@@ -297,6 +467,8 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           company?: string | null
+          company_size?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string
           headline?: string | null
@@ -509,6 +681,50 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      sequence_steps: {
+        Row: {
+          campaign_id: string
+          config: Json
+          created_at: string
+          delay_hours: number
+          id: string
+          step_order: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          config?: Json
+          created_at?: string
+          delay_hours?: number
+          id?: string
+          step_order: number
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          config?: Json
+          created_at?: string
+          delay_hours?: number
+          id?: string
+          step_order?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sequence_steps_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_events: {
         Row: {

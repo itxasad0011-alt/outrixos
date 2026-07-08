@@ -30,6 +30,8 @@ import { Route as AppConversationsRouteImport } from './routes/_app.conversation
 import { Route as AppBrainRouteImport } from './routes/_app.brain'
 import { Route as AppBillingRouteImport } from './routes/_app.billing'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
+import { Route as AppOutreachCampaignIdRouteImport } from './routes/_app.outreach.$campaignId'
+import { Route as ApiPublicWebhooksN8nEventsRouteImport } from './routes/api/public/webhooks/n8n-events'
 import { Route as ApiPublicWebhooksLinkedinRouteImport } from './routes/api/public/webhooks/linkedin'
 
 const AuthRoute = AuthRouteImport.update({
@@ -136,6 +138,17 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOutreachCampaignIdRoute = AppOutreachCampaignIdRouteImport.update({
+  id: '/$campaignId',
+  path: '/$campaignId',
+  getParentRoute: () => AppOutreachRoute,
+} as any)
+const ApiPublicWebhooksN8nEventsRoute =
+  ApiPublicWebhooksN8nEventsRouteImport.update({
+    id: '/api/public/webhooks/n8n-events',
+    path: '/api/public/webhooks/n8n-events',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicWebhooksLinkedinRoute =
   ApiPublicWebhooksLinkedinRouteImport.update({
     id: '/api/public/webhooks/linkedin',
@@ -161,10 +174,12 @@ export interface FileRoutesByFullPath {
   '/not-interested': typeof AppNotInterestedRoute
   '/notifications': typeof AppNotificationsRoute
   '/onboarding': typeof AppOnboardingRoute
-  '/outreach': typeof AppOutreachRoute
+  '/outreach': typeof AppOutreachRouteWithChildren
   '/profile': typeof AppProfileRoute
   '/won': typeof AppWonRoute
+  '/outreach/$campaignId': typeof AppOutreachCampaignIdRoute
   '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
+  '/api/public/webhooks/n8n-events': typeof ApiPublicWebhooksN8nEventsRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -183,11 +198,13 @@ export interface FileRoutesByTo {
   '/not-interested': typeof AppNotInterestedRoute
   '/notifications': typeof AppNotificationsRoute
   '/onboarding': typeof AppOnboardingRoute
-  '/outreach': typeof AppOutreachRoute
+  '/outreach': typeof AppOutreachRouteWithChildren
   '/profile': typeof AppProfileRoute
   '/won': typeof AppWonRoute
   '/': typeof AppIndexRoute
+  '/outreach/$campaignId': typeof AppOutreachCampaignIdRoute
   '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
+  '/api/public/webhooks/n8n-events': typeof ApiPublicWebhooksN8nEventsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -208,11 +225,13 @@ export interface FileRoutesById {
   '/_app/not-interested': typeof AppNotInterestedRoute
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/onboarding': typeof AppOnboardingRoute
-  '/_app/outreach': typeof AppOutreachRoute
+  '/_app/outreach': typeof AppOutreachRouteWithChildren
   '/_app/profile': typeof AppProfileRoute
   '/_app/won': typeof AppWonRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/outreach/$campaignId': typeof AppOutreachCampaignIdRoute
   '/api/public/webhooks/linkedin': typeof ApiPublicWebhooksLinkedinRoute
+  '/api/public/webhooks/n8n-events': typeof ApiPublicWebhooksN8nEventsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -237,7 +256,9 @@ export interface FileRouteTypes {
     | '/outreach'
     | '/profile'
     | '/won'
+    | '/outreach/$campaignId'
     | '/api/public/webhooks/linkedin'
+    | '/api/public/webhooks/n8n-events'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -260,7 +281,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/won'
     | '/'
+    | '/outreach/$campaignId'
     | '/api/public/webhooks/linkedin'
+    | '/api/public/webhooks/n8n-events'
   id:
     | '__root__'
     | '/_app'
@@ -284,13 +307,16 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/won'
     | '/_app/'
+    | '/_app/outreach/$campaignId'
     | '/api/public/webhooks/linkedin'
+    | '/api/public/webhooks/n8n-events'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiPublicWebhooksLinkedinRoute: typeof ApiPublicWebhooksLinkedinRoute
+  ApiPublicWebhooksN8nEventsRoute: typeof ApiPublicWebhooksN8nEventsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -442,6 +468,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/outreach/$campaignId': {
+      id: '/_app/outreach/$campaignId'
+      path: '/$campaignId'
+      fullPath: '/outreach/$campaignId'
+      preLoaderRoute: typeof AppOutreachCampaignIdRouteImport
+      parentRoute: typeof AppOutreachRoute
+    }
+    '/api/public/webhooks/n8n-events': {
+      id: '/api/public/webhooks/n8n-events'
+      path: '/api/public/webhooks/n8n-events'
+      fullPath: '/api/public/webhooks/n8n-events'
+      preLoaderRoute: typeof ApiPublicWebhooksN8nEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/linkedin': {
       id: '/api/public/webhooks/linkedin'
       path: '/api/public/webhooks/linkedin'
@@ -451,6 +491,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AppOutreachRouteChildren {
+  AppOutreachCampaignIdRoute: typeof AppOutreachCampaignIdRoute
+}
+
+const AppOutreachRouteChildren: AppOutreachRouteChildren = {
+  AppOutreachCampaignIdRoute: AppOutreachCampaignIdRoute,
+}
+
+const AppOutreachRouteWithChildren = AppOutreachRoute._addFileChildren(
+  AppOutreachRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
@@ -468,7 +520,7 @@ interface AppRouteChildren {
   AppNotInterestedRoute: typeof AppNotInterestedRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
-  AppOutreachRoute: typeof AppOutreachRoute
+  AppOutreachRoute: typeof AppOutreachRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
   AppWonRoute: typeof AppWonRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -490,7 +542,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppNotInterestedRoute: AppNotInterestedRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppOnboardingRoute: AppOnboardingRoute,
-  AppOutreachRoute: AppOutreachRoute,
+  AppOutreachRoute: AppOutreachRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
   AppWonRoute: AppWonRoute,
   AppIndexRoute: AppIndexRoute,
@@ -502,17 +554,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiPublicWebhooksLinkedinRoute: ApiPublicWebhooksLinkedinRoute,
+  ApiPublicWebhooksN8nEventsRoute: ApiPublicWebhooksN8nEventsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
