@@ -1134,7 +1134,14 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
               const on = selected.has(c.id);
               const pct = c.total_leads ? Math.round((c.completed_leads / c.total_leads) * 100) : 0;
               return (
-                <button key={c.id} onClick={() => m.mutate([c.id])} className="group w-full rounded-2xl border border-border/70 bg-white p-4 text-left shadow-sm shadow-black/[0.02] transition hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md">
+                <div
+                  key={c.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => m.mutate([c.id])}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); m.mutate([c.id]); } }}
+                  className="group w-full cursor-pointer rounded-2xl border border-border/70 bg-white p-4 text-left shadow-sm shadow-black/[0.02] transition hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   <div className="flex items-start gap-3">
                     <Checkbox checked={on} onClick={(e) => { e.stopPropagation(); const next = new Set(selected); if (on) next.delete(c.id); else next.add(c.id); setSelected(next); }} />
                     <div className="min-w-0 flex-1">
@@ -1146,7 +1153,7 @@ function AddToCampaignDialog({ open, onClose, leadIds, onDone }: any) {
                       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} /></div>
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
