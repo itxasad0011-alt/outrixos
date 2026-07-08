@@ -120,8 +120,8 @@ function OutreachCampaigns() {
                 <DropdownMenuItem onSelect={() => setCreateOpen(true)}>
                   <Plus className="mr-2 h-3.5 w-3.5" /> Blank campaign
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  <Copy className="mr-2 h-3.5 w-3.5" /> From template (soon)
+                <DropdownMenuItem onSelect={() => setCreateOpen(true)}>
+                  <Copy className="mr-2 h-3.5 w-3.5" /> Quick-start campaign
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
