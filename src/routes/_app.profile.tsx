@@ -22,6 +22,14 @@ const tabSchema = z.object({
 });
 
 export const Route = createFileRoute("/_app/profile")({
+  head: () => ({
+    meta: [
+      { title: "Profile & AI Sales Brain — Outrix" },
+      { name: "description", content: "Manage your Outrix profile, LinkedIn connection, and AI Sales Brain — the intelligence that personalizes every outreach message." },
+      { property: "og:title", content: "Profile & AI Sales Brain — Outrix" },
+      { property: "og:description", content: "Profile, LinkedIn, and the AI Sales Brain that personalizes your outreach." },
+    ],
+  }),
   component: ProfilePage,
   validateSearch: (s) => tabSchema.parse(s),
 });
