@@ -320,6 +320,25 @@ export const setCampaignLeadPaused = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const bulkUpdateCampaignLeads = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({
+    ids: z.array(z.string().uuid()).min(1).max(1000),
+    action: z.enum(["pause", "resume", "remove"]),
+  }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.action === "remove") {
+      const { error } = await supabase.from("campaign_leads").delete().in("id", data.ids).eq("user_id", userId);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase.from("campaign_leads")
+        .update({ paused: data.action === "pause" }).in("id", data.ids).eq("user_id", userId);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true, count: data.ids.length };
+  });
+
 /* ---------------- Launch ---------------- */
 
 export const launchCampaign = createServerFn({ method: "POST" })
