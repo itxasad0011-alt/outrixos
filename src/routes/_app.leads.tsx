@@ -664,7 +664,7 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
   return (
     <>
       <Sheet open={!!lead} onOpenChange={(o) => !o && onClose()}>
-        <SheetContent className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
+        <SheetContent hideOverlay className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
           <SheetHeader className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 rounded-2xl ring-1 ring-border/70">
