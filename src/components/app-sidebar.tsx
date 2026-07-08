@@ -62,7 +62,7 @@ const groups = [
     label: "Settings",
     items: [
       { title: "Integrations", url: "/integrations", icon: Plug },
-      { title: "Billing", url: "/billing", icon: CreditCard },
+      
       { title: "Notifications", url: "/notifications", icon: Bell },
     ],
   },
