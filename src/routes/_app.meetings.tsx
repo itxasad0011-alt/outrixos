@@ -399,5 +399,13 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
 void ChevronLeft; void ChevronRight;
 
 export const Route = createFileRoute("/_app/meetings")({
+  head: () => ({
+    meta: [
+      { title: "Meetings — Outrix" },
+      { name: "description", content: "Track every meeting booked from your outreach — upcoming calls, no-shows, outcomes, and follow-up actions in one place." },
+      { property: "og:title", content: "Meetings — Outrix" },
+      { property: "og:description", content: "Every meeting booked from your outreach with outcomes and follow-up tracking." },
+    ],
+  }),
   component: MeetingsPage,
 });

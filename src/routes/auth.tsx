@@ -17,7 +17,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Outrix" },
-      { name: "description", content: "Sign in to Outrix, your AI LinkedIn sales agent." },
+      { name: "description", content: "Sign in or create your Outrix account to launch AI-powered LinkedIn outreach, book meetings, and keep your pipeline moving." },
+      { property: "og:title", content: "Sign in — Outrix" },
+      { property: "og:description", content: "Sign in or create your Outrix account to launch AI-powered LinkedIn outreach and manage your sales pipeline." },
     ],
   }),
   component: AuthPage,

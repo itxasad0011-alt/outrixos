@@ -1,0 +1,10 @@
+# Outrix
+
+> Outrix is an AI sales agent that finds prospects, runs LinkedIn outreach, books meetings, and keeps your CRM clean — automatically.
+
+Outrix combines lead discovery, multi-step campaign automation, unified reply management, and pipeline analytics in a single workspace. An AI Sales Brain — trained from the user's LinkedIn profile and knowledge base — personalizes every message and reply.
+
+## Pages
+
+- [Home](/): Product overview and sign-in entry point.
+- [Sign in](/auth): Create an account or sign in to Outrix.

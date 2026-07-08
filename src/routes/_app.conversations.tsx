@@ -19,7 +19,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/conversations")({ component: ConvosPage });
+export const Route = createFileRoute("/_app/conversations")({
+  head: () => ({
+    meta: [
+      { title: "Conversations — Outrix" },
+      { name: "description", content: "Every reply from every campaign in one inbox — with AI-suggested responses, intent detection, and follow-up scheduling." },
+      { property: "og:title", content: "Conversations — Outrix" },
+      { property: "og:description", content: "Unified reply inbox with AI-suggested responses and intent detection." },
+    ],
+  }),
+  component: ConvosPage,
+});
 
 type Convo = {
   id: string;
