@@ -664,7 +664,13 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
   return (
     <>
       <Sheet open={!!lead} modal={false} onOpenChange={(o) => !o && onClose()}>
-        <SheetContent hideOverlay onInteractOutside={(e) => e.preventDefault()} className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
+        <SheetContent
+          hideOverlay
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onFocusOutside={(e) => e.preventDefault()}
+          className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]"
+        >
           <SheetHeader className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
             <SheetDescription className="sr-only">Lead details, AI summary, activity timeline, notes, campaign history, and next actions.</SheetDescription>
             <div className="flex items-start gap-4">
