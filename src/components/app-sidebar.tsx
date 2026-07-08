@@ -15,6 +15,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const groups = [
   {
@@ -181,7 +182,7 @@ export function AppSidebar() {
               <Link to="/notifications"><Bell className="mr-2 h-4 w-4" /> Notifications</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="rounded-lg text-[13px]" onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem className="rounded-lg text-[13px]" onSelect={() => toast("Shortcut", { description: "Press ⌘K or Ctrl K to focus workspace search." })}>
               <Keyboard className="mr-2 h-4 w-4" /> Keyboard Shortcuts
               <span className="ml-auto text-[10.5px] text-muted-foreground">⌘/</span>
             </DropdownMenuItem>
