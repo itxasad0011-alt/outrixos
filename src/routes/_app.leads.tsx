@@ -21,7 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -664,8 +664,9 @@ function LeadDrawer({ lead, onClose, onChanged }: { lead: any | null; onClose: (
   return (
     <>
       <Sheet open={!!lead} onOpenChange={(o) => !o && onClose()}>
-        <SheetContent hideOverlay className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
+        <SheetContent hideOverlay onInteractOutside={(e) => e.preventDefault()} className="flex w-full flex-col overflow-hidden p-0 sm:max-w-[680px]">
           <SheetHeader className="border-b border-border/60 bg-white px-7 pb-6 pt-7">
+            <SheetDescription className="sr-only">Lead details, AI summary, activity timeline, notes, campaign history, and next actions.</SheetDescription>
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 rounded-2xl ring-1 ring-border/70">
                 <AvatarImage src={lead.avatar_url ?? undefined} />
